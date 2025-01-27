@@ -2,7 +2,7 @@
 
 from PyQt5.QtWidgets import * 
 from PyQt5.QtGui import *
-import sys  
+import sys, os
 from PyQt5 import QtWidgets, uic
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
@@ -10,99 +10,10 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
 import json
 from datetime import datetime as dt
+from Ui_testing_gui import Ui_MainWindow
 
-class Question_data():
-    '''
-        Данные из JSON файла 
-    '''
-    id_question:int
-    question:str
-    answers:list
-    right_answers:list
-    choosen_var:list = []
-    answer_result:bool = False
-
-    def __init__(self, id_question, data):
-        self.id_question = id_question
-        self.answers = data["answers"]
-        self.right_answer = data["right_answers"]
-        self.question = data["question"]
-
-
-class Question_gui():
-    '''
-        Класс для управления GUI теста
-    '''
-
-    actual_question:int = 0
-    qty_question:int = 0
-    question_text:QLabel
-
-    choose_answer_1:QCheckBox
-    choose_answer_2:QCheckBox
-    choose_answer_3:QCheckBox
-    choose_answer_4:QCheckBox
-
-    answer_var_1:QLabel
-    answer_var_2:QLabel
-    answer_var_3:QLabel
-    answer_var_4:QLabel
-    qty_question_label:QLabel
-
-    def __init__(self,main_win):
-
-        self.choose_answer_1 = main_win.choose_answer_1
-        self.choose_answer_2 = main_win.choose_answer_2
-        self.choose_answer_3 = main_win.choose_answer_3
-        self.choose_answer_4 = main_win.choose_answer_4
-
-        self.answer_var_1 = main_win.answer_var_1
-        self.answer_var_2 = main_win.answer_var_2
-        self.answer_var_3 = main_win.answer_var_3
-        self.answer_var_4 = main_win.answer_var_4
-        
-        self.question_text = main_win.question_text
-        self.qty_question_label = main_win.qty_question_label
-
-
-    def get_actual_question(self):
-        return self.actual_question
-
-    def reset_actual_question(self):
-        self.actual_question = 0
-
-
-    def set_quest(self, data):
-
-        self.actual_question +=1
-
-        now_quest = data[str(self.actual_question)]
-
-        self.choose_answer_1.setCheckState(False)
-        self.choose_answer_2.setCheckState(False)
-        self.choose_answer_3.setCheckState(False)
-        self.choose_answer_4.setCheckState(False)
-
-        self.answer_var_1.setText(now_quest.answers['1'])
-        self.answer_var_2.setText(now_quest.answers['2'])
-        self.answer_var_3.setText(now_quest.answers['3'])
-        self.answer_var_4.setText(now_quest.answers['4'])
-
-
-        self.question_text.setText(now_quest.question)
-        self.qty_question_label.setText(f'{self.actual_question}/{self.qty_question}')
-
-
-    def get_answer(self):
-
-        data = []
-        if self.choose_answer_1.isChecked(): data.append('1')
-        if self.choose_answer_2.isChecked(): data.append('2')
-        if self.choose_answer_3.isChecked(): data.append('3')
-        if self.choose_answer_4.isChecked(): data.append('4')
-
-        return data
-
+from question_gui import Question_gui
+from question_data import Question_data
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -111,67 +22,167 @@ class MainWindow(QtWidgets.QMainWindow):
     question:Question_gui
     actual_test:str = ''
     start_test: dt = None
-
     screen_list:list = None
 
+    result_data:dict = {}
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        uic.loadUi('testing_gui.ui', self)
 
-        self.screen_list = [ self.test_menu, self.test_box, self.test_result_box, self.main_layout, ]
+        os.makedirs('./result', exist_ok=True)
+        print(os.path.isdir('./result'))
 
-        self.go_to_screen(self.main_layout)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.screen_list = [
+            self.ui.test_menu,
+            self.ui.test_box,
+            self.ui.test_result_box,
+            self.ui.main_layout,
+            self.ui.test_result_box_menue
+        ]
+
+        self._connect_clicks()
         self.question_data, self.meta_data_test = self.init_question_poll()
+        self._go_to_screen(self.ui.main_layout)
 
-        self.next_question.clicked.connect(self.set_next_question)
-        self.pom_dezh_po_chasti.clicked.connect(self.run_test_pomdezh_po_chasti)
+        self.ui.folder_list.currentTextChanged.connect(self.change_list_tests)
+        self.ui.tests_list.currentItemChanged.connect(self.get_test_result)
 
-        self.test_button.clicked.connect(lambda: self.go_to_screen(self.test_menu))
-        self.back_to_main_window.clicked.connect(lambda: self.go_to_screen(self.main_layout))
-        self.back_main_menu.clicked.connect(lambda: self.go_to_screen(self.main_layout))
+    def _connect_clicks(self):
+        
+        self.ui.test_button.clicked.connect(lambda: self._go_to_screen(self.ui.test_menu))
+        self.ui.back_to_main_window.clicked.connect(lambda: self._go_to_screen(self.ui.main_layout))
+        self.ui.back_main_menu.clicked.connect(lambda: self._go_to_screen(self.ui.main_layout))
+        self.ui.back_main_menu_result.clicked.connect(lambda: self._go_to_screen(self.ui.main_layout))
+        self.ui.result_button.clicked.connect(self.init_result_menue)
 
-    def timedelta_formatter(self, td):                       # defining the function
-        td_sec = td.seconds                                  # getting the seconds field of the timedelta
-        hour_count, rem = divmod(td_sec, 3600)               # calculating the total hours
-        minute_count, second_count = divmod(rem, 60)         # distributing the remainders
+        self.ui.next_question.clicked.connect(self._set_next_question)
+        self.ui.pom_dezh_po_chasti.clicked.connect(self.run_test_pomdezh_po_chasti)
+        self.ui.get_result.clicked.connect(self.get_result_window)
+        
+    def _timedelta_formatter(self, td):
+        td_sec = td.seconds
+        hour_count, rem = divmod(td_sec, 3600)
+        minute_count, second_count = divmod(rem, 60)
         msg = "{} Минут, {} Секунд".format(minute_count,second_count)
-        return msg                                           # returning the custom output
+        return msg
+
+    def get_test_result(self):
+
+        curent_fil = self.ui.tests_list.currentItem().text()
+
+        current_dir = self.ui.folder_list.currentText()
+
+        with open(f'./result/{current_dir}/{curent_fil}', "r") as dta: question_result_data = json.load(dta)
+
+        actual_test = question_result_data['actual_test']
+
+
+        t = dt.strptime(question_result_data['total_time'],"%H:%M:%S.%f")
+
+        total_time = f'{t.minute} Минут, {t.second} Секунд'
+        self.ui.type_test_result.setText(self.meta_data_test[actual_test]['description'])
+        self.ui.time_wasted_result.setText(total_time)
+
+
+        self.ui.correct_answers_result.setText(f"{question_result_data['right_ans_qty']}/{len(question_result_data['question_data'])}")
+
+        self.ui.tests_list
+
+    def change_list_tests(self):
+        self.ui.tests_list.clear()
+        dir = self.ui.folder_list.currentText()
+        print(dir)
+        files = os.listdir(path=f'./result/{dir}')
+        data_fil = [f for f in files if os.path.isfile(f'./result/{dir}/{f}')]
+        self.ui.tests_list.addItems(data_fil)
+
+    def init_result_menue(self):
+        self.ui.folder_list.clear()
+        self.result_data = {}
+        self._go_to_screen(self.ui.test_result_box_menue)
+
+        dirs = os.listdir(path='./result')
+
+        self.ui.folder_list.addItems(dirs)
+
+    def get_result_window(self):
+
+        self._go_to_screen(self.ui.test_box)
+        self.question.set_view_mode()
+        self.question.set_quest(data = self.question_data[self.actual_test])
 
     def _hide_all(self):
         for screen in self.screen_list: screen.hide()
 
-    def go_to_screen(self, screen):
+    def _go_to_screen(self, screen):
         self._hide_all()
         screen.show()
 
-    def set_next_question(self):
+    def question_data_to_dict(self, quests):
 
-        answer = self.question.get_answer()
+        data = {}
+
+        for idx, quest in quests.items():
+            data[idx] = {
+                "id_question": quest.id_question,
+                "question": quest.question,
+                "answers": quest.answers,
+                "right_answers": quest.right_answers,
+                "choosen_var": quest.choosen_var,
+                "answer_result": quest.answer_result,
+            }
+        return data
+
+    def _end_test(self):
+        self._go_to_screen(self.ui.test_result_box)
+        self.question.reset_actual_question()
+
+        if self.question.active:
+
+            end_test = dt.now()
+            meta_quest = self.meta_data_test[self.actual_test]
+            total_time = end_test - self.start_test
+            self.ui.type_test_label.setText(meta_quest["description"])
+            self.ui.time_wasted_label.setText(self._timedelta_formatter(total_time))
+            right_ans_qty = 0
+            for idx, quest in self.question_data[self.actual_test].items():
+                if quest.answer_result: right_ans_qty += 1
+            self.ui.correct_answers_label.setText(f"{right_ans_qty}/{self.question.qty_question}")
+
+            os.makedirs(f'./result/{self.ui.fio_input.text()}', exist_ok=True)
+
+            question_data_dict = self.question_data_to_dict(self.question_data[self.actual_test])
+
+            res = {
+
+                "start_test":str(self.start_test),
+                "end_test":str(end_test),
+                "total_time":str(total_time),
+                "actual_test":self.actual_test,
+                "right_ans_qty": right_ans_qty,
+                "question_data":question_data_dict,
+
+            }
+
+            with open(f'./result/{self.ui.fio_input.text()}/{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json', 'w') as fp:
+                json.dump(res,fp)
+            
+
+    def _set_next_question(self):
+        
         id_question = self.question.get_actual_question()
-        question = self.question_data[self.actual_test][str(id_question)]
-
-        question.choosen_var = answer
-        question.answer_result = question.choosen_var == question.right_answer
+        if self.question.active:
+            answer = self.question.get_answer()
+            question = self.question_data[self.actual_test][str(id_question)]
+            question.choosen_var = answer
+            question.answer_result = question.choosen_var == question.right_answers
 
         if self.question.qty_question > id_question:
             self.question.set_quest(data = self.question_data[self.actual_test])
         else:
-            self.go_to_screen(self.test_result_box)
-            self.question.reset_actual_question()
-
-            end_test = dt.now()
-            meta_quest = self.meta_data_test[self.actual_test]
-            kek = end_test- self.start_test
-            self.type_test_label.setText(meta_quest["description"])
-            self.time_wasted_label.setText(self.timedelta_formatter(kek))
-
-            right_ans_qty = 0
-
-            for idx, quest in self.question_data[self.actual_test].items():
-                if quest.answer_result: right_ans_qty += 1
-
-            self.correct_answers_label.setText(f"{right_ans_qty}/{self.question.qty_question}")
+            self._end_test()
 
     def init_question_poll(self) -> dict:
 
@@ -195,9 +206,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def run_test_pomdezh_po_chasti(self):
 
-        self.go_to_screen(self.test_box)
+        self._go_to_screen(self.ui.test_box)
 
         self.question = Question_gui(self)
+        self.question.set_test_mode()
         self.actual_test = "pomdezh_po_chasti"
         self.question.qty_question = len(self.question_data[self.actual_test])
         self.question.set_quest(self.question_data[self.actual_test])
