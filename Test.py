@@ -237,7 +237,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 return 0
             if self.end_test: return 0 
 
-
     def run_test_pomdezh_po_chasti(self):
 
         self._go_to_screen(self.ui.test_box)
