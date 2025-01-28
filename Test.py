@@ -231,13 +231,11 @@ class MainWindow(QtWidgets.QMainWindow):
             sleep(1)
             tme = dt.now() - self.start_test
             self.ui.time_counter.setText(self._timedelta_formatter(tme))
-            print(tme)
-            if tme.seconds >= self.meta_data_test[self.actual_test]['time'] or self.end_test:
-                if self.end_test == True:
-                    pass
+            if tme.seconds >= self.meta_data_test[self.actual_test]['time']:
                 self.end_test = False
                 self._end_test()
                 return 0
+            if self.end_test: return 0 
 
     def run_test_pomdezh_po_chasti(self):
 
