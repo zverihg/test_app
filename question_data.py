@@ -14,4 +14,6 @@ class Question_data():
         self.answers = data["answers"]
         self.right_answers = data["right_answers"]
         self.question = data["question"]
+        if 'choosen_var' in data:
+            self.choosen_var = data['choosen_var'] 
 
