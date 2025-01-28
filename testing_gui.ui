@@ -582,6 +582,24 @@
       <string>0/0</string>
      </property>
     </widget>
+    <widget class="QLabel" name="time_counter">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>670</y>
+       <width>341</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="test_result_box">
     <property name="geometry">
