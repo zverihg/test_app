@@ -178,7 +178,7 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QPushButton" name="add_ne_question">
+    <widget class="QPushButton" name="add_new_question">
      <property name="geometry">
       <rect>
        <x>10</x>

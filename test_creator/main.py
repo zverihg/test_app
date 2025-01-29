@@ -86,10 +86,24 @@ class Test():
 
         return json_data
 
+    def del_quest(self, idx_quest):
+
+        self.poll_questions.pop(idx_quest)
+        tmp = copy(self.poll_questions)
+        self.poll_questions = {}
+        counter = 1
+        for idx, itm in tmp.items():
+            itm.id_question = str(counter)
+            self.poll_questions[str(counter)] = itm
+            counter += 1
+
+
 class MainWindow(QtWidgets.QMainWindow):
 
     active_type:Active_type = Active_type.pomdezh_po_chasti
     tests:Test = None
+    ans_lst:dict = {}
+    chooses_lst:dict = {}
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -100,13 +114,59 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.ans_lst = { '1':self.ui.answer_1, '2':self.ui.answer_2, '3':self.ui.answer_3, '4':self.ui.answer_4,}
+        self.chooses_lst = { '1':self.ui.choose_1, '2':self.ui.choose_2, '3':self.ui.choose_3,'4':self.ui.choose_4,}
         self.load_json()
 
         self.ui.save_curent_question.clicked.connect(self.save_question)
         self.ui.list_questions.clicked.connect(self.clicked_on_row)
+        self.ui.add_new_question.clicked.connect(self.add_new_question)
+        self.ui.type_test_choose.currentIndexChanged.connect(self.change_type)
+        self.ui.delete_curent_question.clicked.connect(self.del_question)
+
+    def del_question(self):
+        
+        idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
+        self.tests[self.active_type].del_quest(idx_quest)
+        self.set_question_list_gui()
+        self.save_to_json()
+
+    def change_type(self):
+
+        self.active_type = Active_type[self.ui.type_test_choose.currentText()]
+        self.set_question_list_gui()
+
+    def add_new_question(self):
+
+        try:
+            idx = self.ui.list_questions.item(len(self.ui.list_questions)-1).text().replace("Вопрос ", "")
+        except:
+            idx = "0"
+        idx = str(int(idx)+1)
+        data = {
+            'id_question':idx,
+            'question': '',
+            'answers':{},
+            'right_answers':{},
+        }
+        self.tests[self.active_type].add_question(copy(data))
+
+        self.ui.list_questions.addItem(f"Вопрос {idx}")
 
     def clicked_on_row(self):
-        print('fuck')
+
+        for itm in self.chooses_lst.values(): itm.setChecked(False)
+        for itm in self.ans_lst.values(): itm.setText("")
+        idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
+        quest = self.tests[self.active_type].poll_questions[idx_quest]
+        self.ui.test_question.setText(quest.question)
+
+        for idx, txt in quest.answers.items():
+            self.ans_lst[idx].setText(txt)
+
+        for idx in quest.right_answers:
+            self.chooses_lst[idx].setChecked(True)
 
     def create_new_json(self):
 
@@ -141,6 +201,7 @@ class MainWindow(QtWidgets.QMainWindow):
             'answers':{},
             'right_answers':{},
         }
+
         self.tests[Active_type.pomdezh_po_chasti].add_question(copy(data))
         self.tests[Active_type.dezh_po_chasti].add_question(copy(data))
 
@@ -150,8 +211,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         with open('./tests_v0.json', 'r') as fil: data = json.load(fil)
 
-        pomdezh_po_chasti = self.tests['pomdezh_po_chasti'].get_json_ready_object()
-        dezh_po_chasti = self.tests['dezh_po_chasti'].get_json_ready_object()
+        pomdezh_po_chasti = self.tests[Active_type.pomdezh_po_chasti].get_json_ready_object()
+        dezh_po_chasti = self.tests[Active_type.dezh_po_chasti].get_json_ready_object()
 
         data['pomdezh_po_chasti'] = pomdezh_po_chasti
         data['dezh_po_chasti'] = dezh_po_chasti
@@ -160,11 +221,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def set_question_list_gui(self):
 
-        ttt = self.tests[self.active_type]
-        
-        
-
-
+        for itm in self.chooses_lst.values(): itm.setChecked(False)
+        for itm in self.ans_lst.values(): itm.setText("")
+        self.ui.test_question.setText('')
+        self.ui.list_questions.clear()
+        poll_questions = self.tests[self.active_type].poll_questions
+        for idx, quest in poll_questions.items():
+            self.ui.list_questions.addItem(f"Вопрос {idx}")
 
     def load_json(self):
 
@@ -174,6 +237,9 @@ class MainWindow(QtWidgets.QMainWindow):
             'pomdezh_po_chasti':{},
             'dezh_po_chasti':{},
         }
+
+        self.ui.type_test_choose.addItems(['pomdezh_po_chasti','dezh_po_chasti'])
+        self.active_type = Active_type.pomdezh_po_chasti
         if not data['pomdezh_po_chasti']['poll_questions'] and not data['dezh_po_chasti']['poll_questions']:
             self.create_new_json()
             return 0
@@ -222,11 +288,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         test_type = self.ui.type_test_choose.currentText()
 
-        self.tests[test_type].poll_questions[id_question] = test
+        self.tests[self.active_type].poll_questions[id_question] = test
 
         self.save_to_json()
-
-
 
 
 app = QtWidgets.QApplication(sys.argv)
