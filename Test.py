@@ -168,7 +168,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if self.ui.fio_input.text() == "":  fio_dir = "Гость"
             else:                               fio_dir = self.ui.fio_input.text() 
-            
+
             os.makedirs(f'./result/{fio_dir}', exist_ok=True)
 
             question_data_dict = self.question_data_to_dict(self.question_data[self.actual_test])
@@ -184,12 +184,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
             with open(f'./result/{fio_dir}/{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json', 'w') as fp:
                 json.dump(res,fp)
-            
+
         elif self.question.active == Status.hist:
             self._go_to_screen(self.ui.test_result_box_menue)
 
     def _set_next_question(self):
-        
+
         id_question = self.question.get_actual_question()
         if self.question.active == Status.test:
             answer = self.question.get_answer()
@@ -220,7 +220,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for idx, tst_key in enumerate(choises,start=1):
                 data_quest = test['poll_questions'][tst_key]
-                
+
                 data[type_test][str(idx)] = Question_data(str(idx), data_quest)
 
         return data, meta_data_test
