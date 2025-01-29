@@ -3,19 +3,10 @@
 from PyQt5.QtWidgets import * 
 from PyQt5.QtGui import *
 import sys, os
-from PyQt5 import QtWidgets, uic
-from pyqtgraph import PlotWidget, plot
-import pyqtgraph as pg
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import *
+from PyQt5 import QtWidgets
 import json
-from datetime import datetime as dt
 from Ui_main import Ui_MainWindow
-from threading import Thread
 from copy import copy
-from time import sleep
-from random import sample
-
 from enum import Enum
 
 class Active_type(Enum):
@@ -97,7 +88,6 @@ class Test():
             self.poll_questions[str(counter)] = itm
             counter += 1
 
-
 class MainWindow(QtWidgets.QMainWindow):
 
     active_type:Active_type = Active_type.pomdezh_po_chasti
@@ -107,8 +97,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-
-        os.makedirs('./result', exist_ok=True)
 
         self.tests = {Active_type.pomdezh_po_chasti:Test(), Active_type.dezh_po_chasti:Test()}
 
@@ -231,29 +219,33 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def load_json(self):
 
-        with open('./tests_v0.json', 'r') as fil: data = json.load(fil)
+        try:
+            with open('./tests_v0.json', 'r') as fil: data = json.load(fil)
 
-        test_dict = {
-            'pomdezh_po_chasti':{},
-            'dezh_po_chasti':{},
-        }
+            test_dict = {
+                'pomdezh_po_chasti':{},
+                'dezh_po_chasti':{},
+            }
 
-        self.ui.type_test_choose.addItems(['pomdezh_po_chasti','dezh_po_chasti'])
-        self.active_type = Active_type.pomdezh_po_chasti
-        if not data['pomdezh_po_chasti']['poll_questions'] and not data['dezh_po_chasti']['poll_questions']:
+            self.ui.type_test_choose.addItems(['pomdezh_po_chasti','dezh_po_chasti'])
+            self.active_type = Active_type.pomdezh_po_chasti
+            if not data['pomdezh_po_chasti']['poll_questions'] and not data['dezh_po_chasti']['poll_questions']:
+                self.create_new_json()
+                return 0
+            
+            for type_test, itm in data.items():
+
+                poll_questions = itm['poll_questions']
+                self.tests[Active_type[type_test]].description = itm['description']
+                self.tests[Active_type[type_test]].time = itm['time']
+                for val in poll_questions.values():
+                    self.tests[Active_type[type_test]].add_question(val)
+                print(itm)
+
+        except:
             self.create_new_json()
-            return 0
-        
-        for type_test, itm in data.items():
-
-            poll_questions = itm['poll_questions']
-            self.tests[Active_type[type_test]].description = itm['description']
-            self.tests[Active_type[type_test]].time = itm['time']
-            for val in poll_questions.values():
-                self.tests[Active_type[type_test]].add_question(val)
-            print(itm)
-
-        self.set_question_list_gui()
+        finally:
+            self.set_question_list_gui()
 
     def save_question(self):
 
@@ -291,7 +283,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tests[self.active_type].poll_questions[id_question] = test
 
         self.save_to_json()
-
 
 app = QtWidgets.QApplication(sys.argv)
 graf = MainWindow()
