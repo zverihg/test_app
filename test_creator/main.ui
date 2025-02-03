@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1327</width>
-    <height>784</height>
+    <width>1329</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(148, 230, 255);</string>
+     <string notr="true">background-color: #EFEFF2;</string>
     </property>
     <property name="title">
      <string/>
@@ -37,6 +37,9 @@
        <width>321</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
     </widget>
     <widget class="QListWidget" name="list_questions">
@@ -53,15 +56,21 @@
        <pointsize>13</pointsize>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
+     </property>
     </widget>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
        <x>350</x>
        <y>20</y>
-       <width>951</width>
+       <width>961</width>
        <height>751</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border:none</string>
      </property>
      <property name="title">
       <string/>
@@ -74,6 +83,11 @@
         <width>951</width>
         <height>71</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 20px;
+padding-left:10px</string>
       </property>
       <property name="inputMask">
        <string/>
@@ -96,6 +110,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QTextEdit" name="answer_1">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 20px;
+padding-left:10px</string>
+           </property>
            <property name="placeholderText">
             <string>Введите ответ и выберите верные</string>
            </property>
@@ -103,6 +122,15 @@
          </item>
          <item>
           <widget class="QCheckBox" name="choose_1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -114,6 +142,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QTextEdit" name="answer_2">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 20px;
+padding-left:10px</string>
+           </property>
            <property name="placeholderText">
             <string>Введите ответ и выберите верные</string>
            </property>
@@ -132,6 +165,9 @@
              <pointsize>200</pointsize>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -143,6 +179,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QTextEdit" name="answer_3">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 20px;
+padding-left:10px</string>
+           </property>
            <property name="placeholderText">
             <string>Введите ответ и выберите верные</string>
            </property>
@@ -150,6 +191,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="choose_3">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -161,6 +205,11 @@
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QTextEdit" name="answer_4">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 20px;
+padding-left:10px</string>
+           </property>
            <property name="placeholderText">
             <string>Введите ответ и выберите верные</string>
            </property>
@@ -168,6 +217,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="choose_4">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -187,6 +239,11 @@
        <height>41</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: #0171CA;
+color: rgb(255, 255, 255);
+border-radius: 10px;</string>
+     </property>
      <property name="text">
       <string>новый вопрос</string>
      </property>
@@ -200,6 +257,11 @@
        <height>41</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: #0171CA;
+color: rgb(255, 255, 255);
+border-radius: 10px;</string>
+     </property>
      <property name="text">
       <string>удалить вопрос</string>
      </property>
@@ -212,6 +274,11 @@
        <width>321</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: #0171CA;
+color: rgb(255, 255, 255);
+border-radius: 10px;</string>
      </property>
      <property name="text">
       <string>сохранить вопрос</string>

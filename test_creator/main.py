@@ -9,6 +9,8 @@ from Ui_main import Ui_MainWindow
 from copy import copy
 from enum import Enum
 
+
+
 class Active_type(Enum):
     pomdezh_po_chasti = 1
     dezh_po_chasti = 2
@@ -99,9 +101,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.tests = {Active_type.pomdezh_po_chasti:Test(), Active_type.dezh_po_chasti:Test()}
-
+        
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle('Конфигуратор тестов')
+        self.setWindowIcon(QIcon(self._resource_path('i.png')))
 
         self.ans_lst = { '1':self.ui.answer_1, '2':self.ui.answer_2, '3':self.ui.answer_3, '4':self.ui.answer_4,}
         self.chooses_lst = { '1':self.ui.choose_1, '2':self.ui.choose_2, '3':self.ui.choose_3,'4':self.ui.choose_4,}
@@ -112,6 +116,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.add_new_question.clicked.connect(self.add_new_question)
         self.ui.type_test_choose.currentIndexChanged.connect(self.change_type)
         self.ui.delete_curent_question.clicked.connect(self.del_question)
+
+    def _resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
+    def _onbin(self, a ): return ' '.join( format( ord(x), 'b') for x in ''.join( json.dumps( a ) ) )
+    def _unbin(self, a ): return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
 
     def del_question(self):
         
@@ -157,7 +172,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.chooses_lst[idx].setChecked(True)
 
     def create_new_json(self):
-
+        self.ui.list_questions.clear()
         raw_json = {
             "pomdezh_po_chasti": {
                 "description": "Помошник дежурного по части",
@@ -171,8 +186,9 @@ class MainWindow(QtWidgets.QMainWindow):
             }
         }
 
-        with open(f'./tests_v0.json', 'w') as fp:
-            json.dump(raw_json,fp)
+        with open(f'./config.json', 'w') as fp:
+            raw_bin_json = self._onbin(raw_json)
+            json.dump(raw_bin_json,fp)
 
         self.tests[Active_type.pomdezh_po_chasti].description = raw_json['pomdezh_po_chasti']['description']
         self.tests[Active_type.pomdezh_po_chasti].time = raw_json['pomdezh_po_chasti']['time']
@@ -197,7 +213,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_to_json(self):
 
-        with open('./tests_v0.json', 'r') as fil: data = json.load(fil)
+        with open('./config.json', 'r') as fil:
+            bin_data = json.load(fil)
+            data = self._unbin(bin_data)
 
         pomdezh_po_chasti = self.tests[Active_type.pomdezh_po_chasti].get_json_ready_object()
         dezh_po_chasti = self.tests[Active_type.dezh_po_chasti].get_json_ready_object()
@@ -205,7 +223,9 @@ class MainWindow(QtWidgets.QMainWindow):
         data['pomdezh_po_chasti'] = pomdezh_po_chasti
         data['dezh_po_chasti'] = dezh_po_chasti
 
-        with open('./tests_v0.json', 'w') as fil: data = json.dump(data,fil)
+        bin_data = self._onbin(data)
+
+        with open('./config.json', 'w') as fil: data = json.dump(bin_data,fil)
 
     def set_question_list_gui(self):
 
@@ -220,7 +240,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def load_json(self):
 
         try:
-            with open('./tests_v0.json', 'r') as fil: data = json.load(fil)
+
+            with open('./config.json', 'r') as fil:
+                bin_data = json.load(fil)
+                data = self._unbin(bin_data)
 
             test_dict = {
                 'pomdezh_po_chasti':{},
@@ -249,40 +272,50 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_question(self):
 
-        answers = {
-            '1':self.ui.answer_1.toPlainText(),
-            '2':self.ui.answer_2.toPlainText(),
-            '3':self.ui.answer_3.toPlainText(),
-            '4':self.ui.answer_4.toPlainText()
-        }
-        right_answers = []
-        chooses = {
-            '1':self.ui.choose_1.checkState(),
-            '2':self.ui.choose_2.checkState(),
-            '3':self.ui.choose_3.checkState(),
-            '4':self.ui.choose_4.checkState(),
-        }
+        if self.ui.list_questions.currentItem():
 
-        for idx, val in chooses.items():
-            if val: right_answers.append(idx)
+            answers = {
+                '1':self.ui.answer_1.toPlainText(),
+                '2':self.ui.answer_2.toPlainText(),
+                '3':self.ui.answer_3.toPlainText(),
+                '4':self.ui.answer_4.toPlainText()
+            }
+            right_answers = []
+            chooses = {
+                '1':self.ui.choose_1.checkState(),
+                '2':self.ui.choose_2.checkState(),
+                '3':self.ui.choose_3.checkState(),
+                '4':self.ui.choose_4.checkState(),
+            }
 
-        id_question = str(self.ui.list_questions.currentItem().text().replace('Вопрос ',''))
+            for idx, val in chooses.items():
+                if val: right_answers.append(idx)
 
-        self.ui.list_questions.currentIndex().data
-        data = {
-            'id_question':id_question,
-            'question': self.ui.test_question.text(),
-            'answers':answers,
-            'right_answers':right_answers,
-        }
+            id_question = str(self.ui.list_questions.currentItem().text().replace('Вопрос ',''))
 
-        test = Question(data)
+            self.ui.list_questions.currentIndex().data
+            data = {
+                'id_question':id_question,
+                'question': self.ui.test_question.text(),
+                'answers':answers,
+                'right_answers':right_answers,
+            }
 
-        test_type = self.ui.type_test_choose.currentText()
+            test = Question(data)
 
-        self.tests[self.active_type].poll_questions[id_question] = test
+            test_type = self.ui.type_test_choose.currentText()
 
-        self.save_to_json()
+            self.tests[self.active_type].poll_questions[id_question] = test
+
+            self.save_to_json()
+        else:
+            
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            # msg.setText("")
+            msg.setInformativeText('Выберите вопрос из списка')
+            # msg.setWindowTitle("Error")
+            msg.exec_()
 
 app = QtWidgets.QApplication(sys.argv)
 graf = MainWindow()

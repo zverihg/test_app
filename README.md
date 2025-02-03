@@ -10,7 +10,7 @@
 
 <p>Далее выполнить</p>
 
-`pyinstaller --hidden-import PyQt5.QtCore --hidden-import PyQt5.QtGui --hidden-import PyQt5.QtWidgets --hidden-import Ui_testing_gui --hidden-import question_gui --hidden-import question_data --hidden-import PyQt5 --python=python3.12 -w  --onefile main.py"`
+`pyinstaller --hidden-import PyQt5.QtCore --hidden-import PyQt5.QtGui --hidden-import PyQt5.QtWidgets --hidden-import Ui_testing_gui --hidden-import question_gui --hidden-import question_data --hidden-import PyQt5 --python=python3.12 -w  --onefile -i "i.png" --add-data "i.png:." main.py`
 
 <p>В директории test_app/dist появится main.exe</p>
 <p>main.exe можно назвать по своему</p>
@@ -22,7 +22,7 @@
 
 <p>Далее выполнить</p>
 
-`pyinstaller --hidden-import PyQt5.QtCore --hidden-import PyQt5.QtGui --hidden-import PyQt5.QtWidgets --hidden-import Ui_main --hidden-import PyQt5 --python=python3.12 -w  --onefile main.py`
+`pyinstaller --hidden-import PyQt5.QtCore --hidden-import PyQt5.QtGui --hidden-import PyQt5.QtWidgets --hidden-import Ui_main --hidden-import PyQt5 --python=python3.12 -w  --onefile -i "i.png" --add-data "i.png:." main.py`
 
 <p>В директории test_creator/dist появится main.exe</p>
 <p>main.exe можно назвать по своему</p>

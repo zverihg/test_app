@@ -34,6 +34,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle('Приложение для тестирования')
+        self.setWindowIcon(QIcon(self._resource_path('i.png')))
+
         self.screen_list = [
             self.ui.test_menu,
             self.ui.test_box,
@@ -49,6 +52,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.folder_list.currentTextChanged.connect(self.change_list_tests)
         self.ui.tests_list.currentItemChanged.connect(self.get_test_result)
 
+    def _resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
+
+    def _onbin(self, a ): return ' '.join( format( ord(x), 'b') for x in ''.join( json.dumps( a ) ) )
+    def _unbin(self, a ):	return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
+
     def _connect_clicks(self):
 
         self.ui.test_button.clicked.connect(lambda: self._go_to_screen(self.ui.test_menu))
@@ -59,6 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.next_question.clicked.connect(self._set_next_question)
         self.ui.pom_dezh_po_chasti.clicked.connect(self.run_test_pomdezh_po_chasti)
+        self.ui.dezh_po_chasti.clicked.connect(self.run_test_dezh_po_chasti)
         self.ui.get_result.clicked.connect(self.get_result_window)
         self.ui.get_result_from_result.clicked.connect(lambda: self.get_result_window(hist=True))
 
@@ -74,7 +90,9 @@ class MainWindow(QtWidgets.QMainWindow):
             curent_fil = self.ui.tests_list.currentItem().text()
             current_dir = self.ui.folder_list.currentText()
 
-            with open(f'./result/{current_dir}/{curent_fil}', "r") as dta: question_result_data = json.load(dta)
+            with open(f'./result/{current_dir}/{curent_fil}', "r") as dta:
+                question_bin_result_data = json.load(dta)
+                question_result_data = self._unbin(question_bin_result_data)
 
             actual_test = question_result_data['actual_test']
 
@@ -108,7 +126,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if hist:
             test_path = f'./result/{self.ui.folder_list.currentText()}/{self.ui.tests_list.currentItem().text()}'
-            with open(test_path, "r") as dta: question_data = json.load(dta)
+            with open(test_path, "r") as dta: 
+                
+                question_bin_data = json.load(dta)
+                question_data = self._unbin(question_bin_data)
 
             self.actual_test = question_data['actual_test']
             data = { self.actual_test: {} }
@@ -180,7 +201,7 @@ class MainWindow(QtWidgets.QMainWindow):
             }
 
             with open(f'./result/{fio_dir}/{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json', 'w') as fp:
-                json.dump(res,fp)
+                json.dump(self._onbin(res),fp)
 
         elif self.question.active == Status.hist:
             self._go_to_screen(self.ui.test_result_box_menue)
@@ -190,7 +211,7 @@ class MainWindow(QtWidgets.QMainWindow):
         id_question = self.question.get_actual_question()
         if self.question.active == Status.test:
             answer = self.question.get_answer()
-            question = self.question_data[self.actual_test][str(id_question)]
+            question:Question_data = self.question_data[self.actual_test][str(id_question)]
             question.choosen_var = answer
             question.answer_result = question.choosen_var == question.right_answers
 
@@ -202,7 +223,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def init_question_poll(self) -> dict:
 
-        with open('./tests_v0.json', "r") as dta: question_data = json.load(dta)
+        with open('./config.json', 'r') as fil:
+            bin_data = json.load(fil)
+            question_data = self._unbin(bin_data)
+
         data = {}
         meta_data_test = {}
 
@@ -213,7 +237,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 "description": question_data[type_test]["description"],
                 "time": question_data[type_test]["time"]
             }
-            choises = sample(list(test['poll_questions'].keys()), 3)
+            
+            choises = sample(list(test['poll_questions'].keys()), len(test['poll_questions'].keys()))
 
             for idx, tst_key in enumerate(choises,start=1):
                 data_quest = test['poll_questions'][tst_key]
@@ -241,6 +266,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.question = Question_gui(self)
         self.question.set_test_mode()
         self.actual_test = "pomdezh_po_chasti"
+        self.question.qty_question = len(self.question_data[self.actual_test])
+        self.question.set_quest(self.question_data[self.actual_test])
+        self.start_test = dt.now()
+        self.time_thread = Thread(target=self.time_counter)
+        self.time_thread.start()
+
+    def run_test_dezh_po_chasti(self):
+
+        self._go_to_screen(self.ui.test_box)
+
+        self.question = Question_gui(self)
+        self.question.set_test_mode()
+        self.actual_test = "dezh_po_chasti"
         self.question.qty_question = len(self.question_data[self.actual_test])
         self.question.set_quest(self.question_data[self.actual_test])
         self.start_test = dt.now()
