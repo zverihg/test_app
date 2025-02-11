@@ -13,6 +13,13 @@ from question_gui import Question_gui, Status
 from question_data import Question_data
 from time import sleep
 from random import sample
+from fpdf import FPDF
+from enum import Enum
+
+class Active_type(Enum):
+    pomdezh_po_chasti = "Помошник дежурного по части"
+    dezh_po_chasti = "Дежурный по части"
+    instructions_DPCH_PDT = "Инструкции по ДПЧ и ПДТ"
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -27,10 +34,16 @@ class MainWindow(QtWidgets.QMainWindow):
     question_timeout_thread:Thread = None
     end_test:bool = False
 
+    last_fio:str=''
+    last_fil:str=''
+
+
+
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         os.makedirs('./result', exist_ok=True)
+        os.makedirs('./export', exist_ok=True)
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -70,13 +83,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.back_main_menu.clicked.connect(lambda: self._go_to_screen(self.ui.main_layout))
         self.ui.back_main_menu_result.clicked.connect(lambda: self._go_to_screen(self.ui.main_layout))
         self.ui.result_button.clicked.connect(self.init_result_menue)
-
         self.ui.next_question.clicked.connect(self._set_next_question)
         self.ui.previous_question.clicked.connect(self._set_prev_question)
         self.ui.pom_dezh_po_chasti.clicked.connect(self.run_test_pomdezh_po_chasti)
         self.ui.dezh_po_chasti.clicked.connect(self.run_test_dezh_po_chasti)
+        self.ui.instructions_DPCH_PDT.clicked.connect(self.run_test_instructions_DPCH_PDT)
         self.ui.get_result.clicked.connect(self.get_result_window)
+        self.ui.get_export_result.clicked.connect(lambda: self.get_report_preproc(True))
+        self.ui.get_export.clicked.connect(lambda: self.get_report_preproc(False))
         self.ui.get_result_from_result.clicked.connect(lambda: self.get_result_window(hist=True))
+
 
     def _timedelta_formatter(self, td):
         td_sec = td.seconds
@@ -183,9 +199,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 "actual_test":self.actual_test,
                 "right_ans_qty": right_ans_qty,
                 "question_data":question_data_dict,
+                "fio": fio_dir,
+                "date": str(dt.now()),
             }
 
-            with open(f'./result/{fio_dir}/{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json', 'w') as fp:
+            self.last_fil = f'{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json'
+            self.last_fio = fio_dir
+
+            with open(f'./result/{self.last_fio}/{self.last_fil}', 'w') as fp:
                 json.dump(self._onbin(res),fp)
 
         elif self.question.active == Status.hist:
@@ -246,13 +267,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 "time": question_data[type_test]["time"]
             }
             
-            choises = sample(list(test['poll_questions'].keys()), len(test['poll_questions'].keys()))
+            if len(test['poll_questions'].keys()) >= 10:
+                choises = sample(list(test['poll_questions'].keys()), 10)
+            else:
+                choises = sample(list(test['poll_questions'].keys()), len(test['poll_questions'].keys()))
 
             for idx, tst_key in enumerate(choises,start=1):
                 data_quest = test['poll_questions'][tst_key]
 
                 data[type_test][str(idx)] = Question_data(str(idx), data_quest)
-
+            print('fffdsf')
         return data, meta_data_test
 
     def question_data_to_dict(self, quests):
@@ -309,7 +333,64 @@ class MainWindow(QtWidgets.QMainWindow):
         self.question_timeout_thread.start()
         self.start_test = dt.now()
 
+    def _get_report(self):
 
+        with open(f'./result/{self.last_fio}/{self.last_fil}', 'r') as fil:
+            bin_data = json.load(fil)
+            question_data = self._unbin(bin_data)
+
+        type_test =  Active_type[question_data['actual_test']].value
+        t = dt.strptime(question_data['total_time'],"%H:%M:%S.%f")
+        total_time = f'{t.minute} Минут, {t.second} Секунд'
+
+        pdf = FPDF()
+        pdf.add_page()
+
+        pdf.add_font('DejaVu', '', self._resource_path('DejaVuSansCondensed.ttf'), uni=True)
+        pdf.set_font("DejaVu", size=14)
+        pdf.cell(200, 10, txt="Отчёт по тесту", ln=1, align="C")
+        pdf.set_font("DejaVu", size=12)
+        pdf.cell(200, 10, txt=f"ФИО: {question_data['fio']}", ln=1, align="L")
+        pdf.cell(200, 10, txt=f"Тип теста: {type_test}", ln=1, align="L")
+        pdf.cell(200, 10, txt=f"Дата: {question_data['date']}", ln=1, align="L")
+        pdf.cell(200, 10, txt=f"Время теста: {total_time}", ln=1, align="L")
+        pdf.cell(200, 10, txt=f"Количество правильных ответов: {question_data['right_ans_qty']}", ln=1, align="L")
+
+        for idx, question in question_data['question_data'].items():
+
+            if not question['answer_result']:
+                pdf.set_text_color(255, 0, 0)
+            else:
+                pdf.set_text_color(0, 0, 0)
+
+            pdf.set_font("DejaVu", size=14)
+
+            pdf.cell(200, 10, txt="", ln=1, align="C")
+            pdf.cell(200, 10, txt=f"Вопрос: {idx}", ln=1, align="C")
+
+            pdf.set_font("DejaVu", size=12)
+
+            for ans_idx, ans_val in question['answers'].items():
+
+                if ans_idx in question['choosen_var']:
+                    if ans_idx not in question['right_answers']:
+                        pdf.set_text_color(255, 0, 0)
+                    else:
+                        pdf.set_text_color(0, 0, 0)
+                else:
+                    pdf.set_text_color(0, 0, 0)
+                
+                pdf.cell(200, 10, txt=f"{ans_val}", ln=1, align="L")
+
+        pdf.output(f"./export/{type_test}_{self.last_fio}.pdf")
+
+    def get_report_preproc(self, end_test):
+
+        if end_test:
+            self.last_fio = self.ui.folder_list.currentText()
+            self.last_fil = self.ui.tests_list.currentItem().text()
+
+        self._get_report()
 
 app = QtWidgets.QApplication(sys.argv)
 graf = MainWindow()

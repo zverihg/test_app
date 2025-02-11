@@ -4,3 +4,5 @@ main.spec
 build/
 config.json
 Thumbs.db
+create_pdf.py
+export/
