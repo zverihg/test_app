@@ -2,6 +2,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from enum import Enum
 from question_data import Question_data
+from threading import Thread
+from time import sleep
+from datetime import datetime as dt
 
 class Status(Enum):
     hist = 1
@@ -29,6 +32,7 @@ class Question_gui():
     answer_var_3:QLabel
     answer_var_4:QLabel
     qty_question_label:QLabel
+    previous_question:QPushButton
     answer_var_list:list
 
     def __init__(self,main_win):
@@ -45,6 +49,7 @@ class Question_gui():
         
         self.question_text = main_win.ui.question_text
         self.qty_question_label = main_win.ui.qty_question_label
+        self.previous_question = main_win.ui.previous_question
         
         self.answer_var_list = [
                 ['1',self.answer_var_1],
@@ -62,13 +67,16 @@ class Question_gui():
         self.choose_answer_2.setEnabled(False)
         self.choose_answer_3.setEnabled(False)
         self.choose_answer_4.setEnabled(False)
+        self.previous_question.show()
         self.active = Status.view
+
 
     def set_hist_mode(self):
         self.choose_answer_1.setEnabled(False)
         self.choose_answer_2.setEnabled(False)
         self.choose_answer_3.setEnabled(False)
         self.choose_answer_4.setEnabled(False)
+        self.previous_question.show()
         self.active = Status.hist
 
     def set_test_mode(self):
@@ -76,9 +84,40 @@ class Question_gui():
         self.choose_answer_2.setEnabled(True)
         self.choose_answer_3.setEnabled(True)
         self.choose_answer_4.setEnabled(True)
+        self.previous_question.hide()
         self.active = Status.test
 
-    def set_quest(self, data):
+    def set_prev_quest(self, data):
+
+        for itm in self.answer_var_list: itm[1].setStyleSheet("")
+
+        if self.actual_question ==1:
+            pass
+        else:
+            self.actual_question -=1
+            
+            now_quest = data[str(self.actual_question)]
+
+            self.answer_var_1.setText(now_quest.answers['1'])
+            self.answer_var_2.setText(now_quest.answers['2'])
+            self.answer_var_3.setText(now_quest.answers['3'])
+            self.answer_var_4.setText(now_quest.answers['4'])
+            self.question_text.setText(now_quest.question)
+            self.qty_question_label.setText(f'{self.actual_question}/{self.qty_question}')
+
+            self.choose_answer_1.setCheckState('1' in now_quest.choosen_var and not self.active == Status.test)
+            self.choose_answer_2.setCheckState('2' in now_quest.choosen_var and not self.active == Status.test)
+            self.choose_answer_3.setCheckState('3' in now_quest.choosen_var and not self.active == Status.test)
+            self.choose_answer_4.setCheckState('4' in now_quest.choosen_var and not self.active == Status.test)
+
+            if self.active in [Status.view, Status.hist]:
+                for itm in self.answer_var_list:
+                    if itm[0] in now_quest.choosen_var and itm[0] not in now_quest.right_answers:
+                        itm[1].setStyleSheet("color: rgb(255, 0, 4);")
+                    else:
+                        itm[1].setStyleSheet("")
+
+    def set_next_quest(self, data):
 
         for itm in self.answer_var_list: itm[1].setStyleSheet("")
 

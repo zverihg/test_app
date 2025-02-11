@@ -14,7 +14,6 @@ from question_data import Question_data
 from time import sleep
 from random import sample
 
-
 class MainWindow(QtWidgets.QMainWindow):
 
     meta_data_test: dict = {}
@@ -25,6 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
     screen_list:list = None
     result_data:dict = {}
     time_thread:Thread = None
+    question_timeout_thread:Thread = None
     end_test:bool = False
 
     def __init__(self, *args, **kwargs):
@@ -60,7 +60,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return os.path.join(base_path, relative_path)
 
-
     def _onbin(self, a ): return ' '.join( format( ord(x), 'b') for x in ''.join( json.dumps( a ) ) )
     def _unbin(self, a ):	return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
 
@@ -73,6 +72,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.result_button.clicked.connect(self.init_result_menue)
 
         self.ui.next_question.clicked.connect(self._set_next_question)
+        self.ui.previous_question.clicked.connect(self._set_prev_question)
         self.ui.pom_dezh_po_chasti.clicked.connect(self.run_test_pomdezh_po_chasti)
         self.ui.dezh_po_chasti.clicked.connect(self.run_test_dezh_po_chasti)
         self.ui.get_result.clicked.connect(self.get_result_window)
@@ -144,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self._go_to_screen(self.ui.test_box)
         if not hist: self.question.set_view_mode()
-        self.question.set_quest(data = self.question_data[self.actual_test])
+        self.question.set_next_quest(data = self.question_data[self.actual_test])
 
     def _hide_all(self):
         for screen in self.screen_list: screen.hide()
@@ -152,21 +152,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def _go_to_screen(self, screen):
         self._hide_all()
         screen.show()
-
-    def question_data_to_dict(self, quests):
-
-        data = {}
-
-        for idx, quest in quests.items():
-            data[idx] = {
-                "id_question": quest.id_question,
-                "question": quest.question,
-                "answers": quest.answers,
-                "right_answers": quest.right_answers,
-                "choosen_var": quest.choosen_var,
-                "answer_result": quest.answer_result,
-            }
-        return data
 
     def _end_test(self):
         self._go_to_screen(self.ui.test_result_box)
@@ -206,6 +191,25 @@ class MainWindow(QtWidgets.QMainWindow):
         elif self.question.active == Status.hist:
             self._go_to_screen(self.ui.test_result_box_menue)
 
+    def _question_timeout_counter(self):
+
+        actual_question = self.question.actual_question
+        question_start = dt.now()
+        while True:
+            if self.end_test == True:
+                return 0
+            if actual_question != self.question.actual_question:
+                return 0
+
+            sleep(1)
+            delta = dt.now() - question_start
+            print(delta.seconds)
+            if delta.seconds >= 30:
+                self._set_next_question()
+                return 0
+
+            self.ui.time_counter.setText(f'На вопрос осталось {30 - delta.seconds} секунд')
+
     def _set_next_question(self):
 
         id_question = self.question.get_actual_question()
@@ -214,12 +218,16 @@ class MainWindow(QtWidgets.QMainWindow):
             question:Question_data = self.question_data[self.actual_test][str(id_question)]
             question.choosen_var = answer
             question.answer_result = question.choosen_var == question.right_answers
-
         if self.question.qty_question > id_question:
-            self.question.set_quest(data = self.question_data[self.actual_test])
+            self.question.set_next_quest(data = self.question_data[self.actual_test])
+            self.question_timeout_thread = Thread(target=self._question_timeout_counter)
+            self.question_timeout_thread.start()         
         else:
             self.end_test = True
             self._end_test()
+
+    def _set_prev_question(self):
+        self.question.set_prev_quest(data = self.question_data[self.actual_test])
 
     def init_question_poll(self) -> dict:
 
@@ -247,17 +255,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return data, meta_data_test
 
-    def time_counter(self):
-        self.end_test = False
-        while True:
-            sleep(1)
-            tme = dt.now() - self.start_test
-            self.ui.time_counter.setText(self._timedelta_formatter(tme))
-            if tme.seconds >= self.meta_data_test[self.actual_test]['time']:
-                self.end_test = False
-                self._end_test()
-                return 0
-            if self.end_test: return 0 
+    def question_data_to_dict(self, quests):
+
+        data = {}
+
+        for idx, quest in quests.items():
+            data[idx] = {
+                "id_question": quest.id_question,
+                "question": quest.question,
+                "answers": quest.answers,
+                "right_answers": quest.right_answers,
+                "choosen_var": quest.choosen_var,
+                "answer_result": quest.answer_result,
+            }
+        return data
 
     def run_test_pomdezh_po_chasti(self):
 
@@ -267,10 +278,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.question.set_test_mode()
         self.actual_test = "pomdezh_po_chasti"
         self.question.qty_question = len(self.question_data[self.actual_test])
-        self.question.set_quest(self.question_data[self.actual_test])
+        self.question.set_next_quest(self.question_data[self.actual_test])
+        self.question_timeout_thread = Thread(target=self._question_timeout_counter)
+        self.question_timeout_thread.start()
         self.start_test = dt.now()
-        self.time_thread = Thread(target=self.time_counter)
-        self.time_thread.start()
 
     def run_test_dezh_po_chasti(self):
 
@@ -280,10 +291,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.question.set_test_mode()
         self.actual_test = "dezh_po_chasti"
         self.question.qty_question = len(self.question_data[self.actual_test])
-        self.question.set_quest(self.question_data[self.actual_test])
+        self.question.set_next_quest(self.question_data[self.actual_test])
+        self.question_timeout_thread = Thread(target=self._question_timeout_counter)
+        self.question_timeout_thread.start()
         self.start_test = dt.now()
-        self.time_thread = Thread(target=self.time_counter)
-        self.time_thread.start()
+
+    def run_test_instructions_DPCH_PDT(self):
+
+        self._go_to_screen(self.ui.test_box)
+
+        self.question = Question_gui(self)
+        self.question.set_test_mode()
+        self.actual_test = "instructions_DPCH_PDT"
+        self.question.qty_question = len(self.question_data[self.actual_test])
+        self.question.set_next_quest(self.question_data[self.actual_test])
+        self.question_timeout_thread = Thread(target=self._question_timeout_counter)
+        self.question_timeout_thread.start()
+        self.start_test = dt.now()
+
+
 
 app = QtWidgets.QApplication(sys.argv)
 graf = MainWindow()

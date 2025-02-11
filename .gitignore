@@ -3,3 +3,4 @@ __pycache__/
 main.spec
 build/
 config.json
+Thumbs.db

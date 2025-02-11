@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1171</width>
-    <height>719</height>
+    <height>721</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -239,6 +239,29 @@ border-radius: 10px;</string>
         </property>
         <property name="text">
          <string>Помошник дежурного</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="instructions_DPCH_PDT">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>68</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #0171CA;
+color: rgb(255, 255, 255);
+border-radius: 10px;</string>
+        </property>
+        <property name="text">
+         <string>Инструкции ДПЧ и ПДТ</string>
         </property>
        </widget>
       </item>
@@ -623,9 +646,9 @@ border-radius: 10px;</string>
     <widget class="QLabel" name="qty_question_label">
      <property name="geometry">
       <rect>
-       <x>820</x>
+       <x>800</x>
        <y>670</y>
-       <width>41</width>
+       <width>61</width>
        <height>31</height>
       </rect>
      </property>
@@ -654,6 +677,24 @@ border-radius: 10px;</string>
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="previous_question">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>660</y>
+       <width>231</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: #0171CA;
+color: rgb(255, 255, 255);
+border-radius: 10px;</string>
+     </property>
+     <property name="text">
+      <string>Предыдущий вопрос</string>
      </property>
     </widget>
    </widget>
@@ -1122,11 +1163,11 @@ border-radius: 10px;</string>
      </layout>
     </widget>
    </widget>
-   <zorder>test_menu</zorder>
    <zorder>main_layout</zorder>
    <zorder>test_result_box</zorder>
    <zorder>test_result_box_menue</zorder>
    <zorder>test_box</zorder>
+   <zorder>test_menu</zorder>
   </widget>
  </widget>
  <resources/>
