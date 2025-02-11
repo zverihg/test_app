@@ -1,6 +1,6 @@
 @echo off
 cd ./test_app
-pyinstaller --hidden-import PyQt5.QtCore  --hidden-import PyQt5.QtGui --hidden-import PyQt5.QtWidgets --hidden-import Ui_testing_gui --hidden-import question_gui --hidden-import question_data --hidden-import PyQt5 --python=python3.12 -w --onefile -i "i.png" --add-data "i.png:." --add-data "DejaVuSansCondensed.ttf:." main.py
+pyinstaller --hidden-import PyQt5.QtCore  --hidden-import PyQt5.QtGui --hidden-import PyQt5.QtWidgets --hidden-import Ui_testing_gui --hidden-import question_gui --hidden-import question_data --hidden-import PyQt5 -w --onefile -i "i.png" --add-data "i.png:." --add-data "DejaVuSansCondensed.ttf:." main.py
 copy dist\main.exe ..\compiled_apps\Test.exe
 
 cd ../test_creator

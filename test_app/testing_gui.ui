@@ -203,6 +203,9 @@ border-radius: 10px;</string>
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
@@ -232,6 +235,9 @@ border-radius: 10px;</string>
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
 color: rgb(255, 255, 255);
@@ -255,6 +261,9 @@ border-radius: 10px;</string>
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
 color: rgb(255, 255, 255);
@@ -277,6 +286,9 @@ border-radius: 10px;</string>
          <font>
           <pointsize>16</pointsize>
          </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
@@ -634,6 +646,9 @@ padding-left:10px</string>
        <height>41</height>
       </rect>
      </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
      <property name="styleSheet">
       <string notr="true">background-color: #0171CA;
 color: rgb(255, 255, 255);
@@ -687,6 +702,9 @@ border-radius: 10px;</string>
        <width>231</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: #0171CA;
@@ -850,6 +868,9 @@ padding-left:10px</string>
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
 color: rgb(255, 255, 255);
@@ -872,6 +893,9 @@ border-radius: 10px;</string>
          <font>
           <pointsize>16</pointsize>
          </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
@@ -904,6 +928,9 @@ border-radius: 10px;</string>
          <font>
           <pointsize>16</pointsize>
          </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
@@ -956,6 +983,9 @@ padding-left:10px</string>
        <width>371</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
      </property>
     </widget>
     <widget class="QWidget" name="verticalLayoutWidget_5">
@@ -1095,6 +1125,9 @@ padding-left:10px</string>
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
 color: rgb(255, 255, 255);
@@ -1117,6 +1150,9 @@ border-radius: 10px;</string>
          <font>
           <pointsize>16</pointsize>
          </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
@@ -1150,6 +1186,9 @@ border-radius: 10px;</string>
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: #0171CA;
 color: rgb(255, 255, 255);
@@ -1164,10 +1203,10 @@ border-radius: 10px;</string>
     </widget>
    </widget>
    <zorder>main_layout</zorder>
-   <zorder>test_result_box</zorder>
-   <zorder>test_result_box_menue</zorder>
    <zorder>test_box</zorder>
    <zorder>test_menu</zorder>
+   <zorder>test_result_box</zorder>
+   <zorder>test_result_box_menue</zorder>
   </widget>
  </widget>
  <resources/>

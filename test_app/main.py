@@ -16,7 +16,7 @@ from random import sample
 from fpdf import FPDF
 from enum import Enum
 
-class Active_type(Enum):
+class Actual_test(Enum):
     pomdezh_po_chasti = "Помошник дежурного по части"
     dezh_po_chasti = "Дежурный по части"
     instructions_DPCH_PDT = "Инструкции по ДПЧ и ПДТ"
@@ -339,7 +339,7 @@ class MainWindow(QtWidgets.QMainWindow):
             bin_data = json.load(fil)
             question_data = self._unbin(bin_data)
 
-        type_test =  Active_type[question_data['actual_test']].value
+        type_test =  Actual_test[question_data['actual_test']].value
         t = dt.strptime(question_data['total_time'],"%H:%M:%S.%f")
         total_time = f'{t.minute} Минут, {t.second} Секунд'
 

@@ -24,6 +24,7 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.type_test_choose = QtWidgets.QComboBox(self.groupBox)
         self.type_test_choose.setGeometry(QtCore.QRect(10, 20, 321, 41))
+        self.type_test_choose.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.type_test_choose.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.type_test_choose.setObjectName("type_test_choose")
         self.list_questions = QtWidgets.QListWidget(self.groupBox)
@@ -118,18 +119,21 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.add_new_question = QtWidgets.QPushButton(self.groupBox)
         self.add_new_question.setGeometry(QtCore.QRect(10, 680, 151, 41))
+        self.add_new_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.add_new_question.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
         self.add_new_question.setObjectName("add_new_question")
         self.delete_curent_question = QtWidgets.QPushButton(self.groupBox)
         self.delete_curent_question.setGeometry(QtCore.QRect(170, 680, 161, 41))
+        self.delete_curent_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.delete_curent_question.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
         self.delete_curent_question.setObjectName("delete_curent_question")
         self.save_curent_question = QtWidgets.QPushButton(self.groupBox)
         self.save_curent_question.setGeometry(QtCore.QRect(10, 730, 321, 41))
+        self.save_curent_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.save_curent_question.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")

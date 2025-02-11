@@ -112,6 +112,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.dezh_po_chasti.setFont(font)
+        self.dezh_po_chasti.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.dezh_po_chasti.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.dezh_po_chasti.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
@@ -124,6 +125,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.pom_dezh_po_chasti.setFont(font)
+        self.pom_dezh_po_chasti.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pom_dezh_po_chasti.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -134,6 +136,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.instructions_DPCH_PDT.setFont(font)
+        self.instructions_DPCH_PDT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.instructions_DPCH_PDT.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -144,6 +147,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.back_to_main_window.setFont(font)
+        self.back_to_main_window.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.back_to_main_window.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -302,6 +306,7 @@ class Ui_MainWindow(object):
         self.question_list_layout.addLayout(self.question_box_4)
         self.next_question = QtWidgets.QPushButton(self.test_box)
         self.next_question.setGeometry(QtCore.QRect(880, 660, 231, 41))
+        self.next_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.next_question.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -321,6 +326,7 @@ class Ui_MainWindow(object):
         self.time_counter.setObjectName("time_counter")
         self.previous_question = QtWidgets.QPushButton(self.test_box)
         self.previous_question.setGeometry(QtCore.QRect(80, 660, 231, 41))
+        self.previous_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.previous_question.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -408,6 +414,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.get_export.setFont(font)
+        self.get_export.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.get_export.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -422,6 +429,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.get_result.setFont(font)
+        self.get_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.get_result.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -438,6 +446,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.back_main_menu.setFont(font)
+        self.back_main_menu.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.back_main_menu.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -456,6 +465,7 @@ class Ui_MainWindow(object):
         self.tests_list.setObjectName("tests_list")
         self.folder_list = QtWidgets.QComboBox(self.test_result_box_menue)
         self.folder_list.setGeometry(QtCore.QRect(30, 20, 371, 41))
+        self.folder_list.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.folder_list.setObjectName("folder_list")
         self.verticalLayoutWidget_5 = QtWidgets.QWidget(self.test_result_box_menue)
         self.verticalLayoutWidget_5.setGeometry(QtCore.QRect(430, 90, 681, 581))
@@ -538,6 +548,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.get_export_result.setFont(font)
+        self.get_export_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.get_export_result.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -552,6 +563,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.get_result_from_result.setFont(font)
+        self.get_result_from_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.get_result_from_result.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
@@ -568,16 +580,17 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.back_main_menu_result.setFont(font)
+        self.back_main_menu_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.back_main_menu_result.setStyleSheet("background-color: #0171CA;\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 10px;")
         self.back_main_menu_result.setObjectName("back_main_menu_result")
         self.verticalLayout_4.addWidget(self.back_main_menu_result)
         self.main_layout.raise_()
-        self.test_result_box.raise_()
-        self.test_result_box_menue.raise_()
         self.test_box.raise_()
         self.test_menu.raise_()
+        self.test_result_box.raise_()
+        self.test_result_box_menue.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
