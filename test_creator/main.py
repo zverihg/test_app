@@ -7,21 +7,14 @@ from PyQt5 import QtWidgets
 import json
 from Ui_main import Ui_MainWindow
 from copy import copy
-from enum import Enum
 
-class Active_type(Enum):
-    pomdezh_po_chasti = 1
-    dezh_po_chasti = 2
-    instructions_DPCH_PDT = 3
-
-class Question():
+class QuestionPool():
     id_question:str
     question:str
     answers:dict
     right_answers:list
     choosen_var:list = []
     answer_result:bool = False
-
 
     def __init__(self, data):
 
@@ -30,77 +23,15 @@ class Question():
         self.answers = data['answers']
         self.right_answers = data['right_answers']
 
-class Test():
-
-    description:str
-    time:int
-    poll_questions:dict = {}
-
-    def __init__(self):
-        self.poll_questions = dict()
-
-    def set_data(self,data):
-
-        self.description = data['description']
-        self.time = data['time']
-        self.poll_questions = data['poll_questions']
-
-    def add_question(self,quest):
-
-        data = {
-            'id_question':quest['id_question'],
-            'question': quest['question'],
-            'answers':quest['answers'],
-            'right_answers':quest['right_answers'],
-        }
-        self.poll_questions[quest['id_question']] = Question(data)
-
-    def get_json_ready_object(self):
-
-        dict_poll_questions = {}
-
-        for idx, itm in self.poll_questions.items():
-
-            dict_poll_questions[idx] = {
-                'id_question':itm.id_question,
-                'question':itm.question,
-                'answers':itm.answers,
-                'right_answers':itm.right_answers,
-                'choosen_var':itm.choosen_var,
-                'answer_result':itm.answer_result,
-            }
-
-        json_data = {
-            "description":self.description,
-            "time":self.time,
-            "poll_questions":dict_poll_questions
-        }
-
-        return json_data
-
-    def del_quest(self, idx_quest):
-
-        self.poll_questions.pop(idx_quest)
-        tmp = copy(self.poll_questions)
-        self.poll_questions = {}
-        counter = 1
-        for idx, itm in tmp.items():
-            itm.id_question = str(counter)
-            self.poll_questions[str(counter)] = itm
-            counter += 1
-
 class MainWindow(QtWidgets.QMainWindow):
 
-    active_type:Active_type = Active_type.pomdezh_po_chasti
-    tests:Test = None
     ans_lst:dict = {}
     chooses_lst:dict = {}
+    question_pool:dict = {}
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
-        self.tests = {Active_type.pomdezh_po_chasti:Test(), Active_type.dezh_po_chasti:Test(), Active_type.instructions_DPCH_PDT:Test()}
-        
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle('Конфигуратор тестов')
@@ -113,8 +44,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.save_curent_question.clicked.connect(self.save_question)
         self.ui.list_questions.clicked.connect(self.clicked_on_row)
         self.ui.add_new_question.clicked.connect(self.add_new_question)
-        self.ui.type_test_choose.currentIndexChanged.connect(self.change_type)
         self.ui.delete_curent_question.clicked.connect(self.del_question)
+
+    def _get_json_ready_object(self):
+
+        dict_poll_questions = {}
+
+        for idx, question in self.question_pool.items():
+
+            dict_poll_questions[idx] = {
+                'id_question':question.id_question,
+                'question':question.question,
+                'answers':question.answers,
+                'right_answers':question.right_answers,
+                'choosen_var':question.choosen_var,
+                'answer_result':question.answer_result,
+            }
+
+        return dict_poll_questions
 
     def _resource_path(self, relative_path):
         try:
@@ -129,19 +76,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def del_question(self):
         
-        idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
-        self.tests[self.active_type].del_quest(idx_quest)
+        idx_question = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
+
+        self.question_pool.pop(idx_question)
+
+        tmp = copy(self.question_pool)
+        self.question_pool = {}
+        counter = 1
+        for question in tmp.values():
+            question.id_question = str(counter)
+            self.question_pool[str(counter)] = question
+            counter += 1
+
         self.set_question_list_gui()
         self.clicked_on_row()
-
         self.save_to_json()
-
-    def change_type(self):
-
-        self.active_type = Active_type[self.ui.type_test_choose.currentText()]
-        self.set_question_list_gui()
-        self.clicked_on_row()
-
 
     def add_new_question(self):
 
@@ -157,8 +106,7 @@ class MainWindow(QtWidgets.QMainWindow):
             'answers':{},
             'right_answers':{},
         }
-        self.tests[self.active_type].add_question(copy(data))
-
+        self.question_pool[idx] = QuestionPool(data=copy(data))
         self.ui.list_questions.addItem(f"Вопрос {idx}")
 
     def clicked_on_row(self):
@@ -166,7 +114,8 @@ class MainWindow(QtWidgets.QMainWindow):
         for itm in self.chooses_lst.values(): itm.setChecked(False)
         for itm in self.ans_lst.values(): itm.setText("")
         idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
-        quest = self.tests[self.active_type].poll_questions[idx_quest]
+        
+        quest = self.question_pool[idx_quest]
         self.ui.test_question.setText(quest.question)
 
         for idx, txt in quest.answers.items():
@@ -177,38 +126,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def create_new_json(self):
         self.ui.list_questions.clear()
-        raw_json = {
-            "pomdezh_po_chasti": {
-                "description": "Помошник дежурного по части",
-                "time": 600,
-                "poll_questions": {}
-            },
-            "dezh_po_chasti": {
-                "description": "Дежурный по части",
-                "time": 600,
-                "poll_questions": {}
-            },
-            "instructions_DPCH_PDT": {
-                "description": "Инструкции ДПЧ и ПДТ",
-                "time": 600,
-                "poll_questions": {}
-            }
-        }
+        raw_json = {}
 
         with open(f'./config.json', 'w') as fp:
             raw_bin_json = self._onbin(raw_json)
             json.dump(raw_bin_json,fp)
-
-        self.tests[Active_type.pomdezh_po_chasti].description = raw_json['pomdezh_po_chasti']['description']
-        self.tests[Active_type.pomdezh_po_chasti].time = raw_json['pomdezh_po_chasti']['time']
-
-        self.tests[Active_type.dezh_po_chasti].description = raw_json['dezh_po_chasti']['description']
-        self.tests[Active_type.dezh_po_chasti].time = raw_json['dezh_po_chasti']['time']
-
-        self.tests[Active_type.instructions_DPCH_PDT].description = raw_json['instructions_DPCH_PDT']['description']
-        self.tests[Active_type.instructions_DPCH_PDT].time = raw_json['instructions_DPCH_PDT']['time']
-
-        self.ui.type_test_choose.addItems(['pomdezh_po_chasti', 'dezh_po_chasti', 'instructions_DPCH_PDT'])
 
         data = {
             'id_question':'1',
@@ -217,29 +139,22 @@ class MainWindow(QtWidgets.QMainWindow):
             'right_answers':{},
         }
 
-        self.tests[Active_type.pomdezh_po_chasti].add_question(copy(data))
-        self.tests[Active_type.dezh_po_chasti].add_question(copy(data))
-        self.tests[Active_type.instructions_DPCH_PDT].add_question(copy(data))
-
+        self.question_pool['1'] = QuestionPool(data=copy(data))
         self.ui.list_questions.addItem('Вопрос 1')
 
     def save_to_json(self):
 
-        with open('./config.json', 'r') as fil:
-            bin_data = json.load(fil)
-            data = self._unbin(bin_data)
+        json_question = self._get_json_ready_object()
 
-        pomdezh_po_chasti = self.tests[Active_type.pomdezh_po_chasti].get_json_ready_object()
-        dezh_po_chasti = self.tests[Active_type.dezh_po_chasti].get_json_ready_object()
-        instructions_DPCH_PDT = self.tests[Active_type.instructions_DPCH_PDT].get_json_ready_object()
+        bin_data = self._onbin(json_question)
+        with open('./config.json', 'w') as fil:
+            json.dump(bin_data,fil)
 
-        data['pomdezh_po_chasti'] = pomdezh_po_chasti
-        data['dezh_po_chasti'] = dezh_po_chasti
-        data['instructions_DPCH_PDT'] = instructions_DPCH_PDT
-
-        bin_data = self._onbin(data)
-
-        with open('./config.json', 'w') as fil: data = json.dump(bin_data,fil)
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setInformativeText('Вопросы сохранены')
+        msg.StandardButton(QMessageBox.Ok)
+        msg.exec_()
 
     def set_question_list_gui(self):
 
@@ -247,8 +162,8 @@ class MainWindow(QtWidgets.QMainWindow):
         for itm in self.ans_lst.values(): itm.setText("")
         self.ui.test_question.setText('')
         self.ui.list_questions.clear()
-        poll_questions = self.tests[self.active_type].poll_questions
-        for idx, quest in poll_questions.items():
+
+        for idx in self.question_pool.keys():
             self.ui.list_questions.addItem(f"Вопрос {idx}")
 
         item = self.ui.list_questions.item(0)
@@ -261,27 +176,19 @@ class MainWindow(QtWidgets.QMainWindow):
                 bin_data = json.load(fil)
                 data = self._unbin(bin_data)
 
-            self.ui.type_test_choose.addItems(['pomdezh_po_chasti','dezh_po_chasti', 'instructions_DPCH_PDT'])
-            self.active_type = Active_type.pomdezh_po_chasti
-            if not data['pomdezh_po_chasti']['poll_questions'] and not data['dezh_po_chasti']['poll_questions'] and not data['instructions_DPCH_PDT']['poll_questions']:
+            if not data:
                 self.create_new_json()
-                return 0
-    
-            for type_test, itm in data.items():
+            else:
+                for idx, question in data.items():
+                    self.question_pool[idx] = QuestionPool(question)
 
-                poll_questions = itm['poll_questions']
-                self.tests[Active_type[type_test]].description = itm['description']
-                self.tests[Active_type[type_test]].time = itm['time']
-                for val in poll_questions.values():
-                    self.tests[Active_type[type_test]].add_question(val)
-
-        except:
+        except Exception as e:
+            print(e)
             self.create_new_json()
         finally:
             self.set_question_list_gui()
             self.clicked_on_row()
             
-
     def save_question(self):
 
         if self.ui.list_questions.currentItem():
@@ -292,28 +199,50 @@ class MainWindow(QtWidgets.QMainWindow):
                 '3':self.ui.answer_3.toPlainText(),
                 '4':self.ui.answer_4.toPlainText()
             }
+
+            for answer in answers.values():
+                if not answer:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setInformativeText('Все поля должны быть заполнены')
+                    msg.exec_()
+                    return 0 
+
             chooses = {
                 '1':self.ui.choose_1.checkState(),
                 '2':self.ui.choose_2.checkState(),
                 '3':self.ui.choose_3.checkState(),
                 '4':self.ui.choose_4.checkState(),
             }
+
             right_answers = []
 
             for idx, val in chooses.items():
                 if val: right_answers.append(idx)
 
+            if not right_answers:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setInformativeText('Выберите хотябы один правильный ответ')
+                msg.exec_()
+                return 0
+
+            if not self.ui.test_question.text():
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setInformativeText('Все поля должны быть заполнены')
+                msg.exec_()
+                return 0
+
             id_question = str(self.ui.list_questions.currentItem().text().replace('Вопрос ',''))
 
-            self.ui.list_questions.currentIndex().data
             data = {
                 'id_question':id_question,
                 'question': self.ui.test_question.text(),
                 'answers':answers,
                 'right_answers':right_answers,
             }
-            test = Question(data)
-            self.tests[self.active_type].poll_questions[id_question] = test
+            self.question_pool[id_question] = QuestionPool(data)
             self.save_to_json()
         else:
             msg = QMessageBox()

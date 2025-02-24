@@ -10,20 +10,43 @@ from datetime import datetime as dt
 from Ui_testing_gui import Ui_MainWindow
 from threading import Thread
 from question_gui import Question_gui, Status
-from question_data import Question_data
 from time import sleep
 from random import sample
 from fpdf import FPDF
 from enum import Enum
+
+class QuestionPool():
+    id_question:str
+    question:str
+    answers:dict
+    right_answers:list
+    choosen_var:list = []
+    answer_result:bool = False
+
+    def __init__(self, data):
+
+        self.id_question = data['id_question']
+        self.question = data['question']
+        self.answers = data['answers']
+        self.right_answers = data['right_answers']
 
 class Actual_test(Enum):
     pomdezh_po_chasti = "Помошник дежурного по части"
     dezh_po_chasti = "Дежурный по части"
     instructions_DPCH_PDT = "Инструкции по ДПЧ и ПДТ"
 
+class ThereadStatus(Enum):
+    run = "run"
+    stop = "stop"
+    end = "end"
+    timeout = "timeout"
+
 class MainWindow(QtWidgets.QMainWindow):
 
-    meta_data_test: dict = {}
+    question_pool:dict = {}
+    qty_question:int = 0
+
+    # meta_data_test: dict = {}
     question_list:dict = {}
     question:Question_gui
     actual_test:str = ''
@@ -32,12 +55,10 @@ class MainWindow(QtWidgets.QMainWindow):
     result_data:dict = {}
     time_thread:Thread = None
     question_timeout_thread:Thread = None
-    end_test:bool = False
+    test_status:ThereadStatus = ThereadStatus.run
 
     last_fio:str=''
     last_fil:str=''
-
-
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -59,11 +80,12 @@ class MainWindow(QtWidgets.QMainWindow):
         ]
 
         self._connect_clicks()
-        self.question_data, self.meta_data_test = self.init_question_poll()
+        self.init_question_poll()
         self._go_to_screen(self.ui.main_layout)
 
         self.ui.folder_list.currentTextChanged.connect(self.change_list_tests)
         self.ui.tests_list.currentItemChanged.connect(self.get_test_result)
+
 
     def _resource_path(self, relative_path):
         try:
@@ -85,14 +107,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.result_button.clicked.connect(self.init_result_menue)
         self.ui.next_question.clicked.connect(self._set_next_question)
         self.ui.previous_question.clicked.connect(self._set_prev_question)
+
         self.ui.pom_dezh_po_chasti.clicked.connect(self.run_test_pomdezh_po_chasti)
         self.ui.dezh_po_chasti.clicked.connect(self.run_test_dezh_po_chasti)
         self.ui.instructions_DPCH_PDT.clicked.connect(self.run_test_instructions_DPCH_PDT)
+
         self.ui.get_result.clicked.connect(self.get_result_window)
         self.ui.get_export_result.clicked.connect(lambda: self.get_report_preproc(True))
         self.ui.get_export.clicked.connect(lambda: self.get_report_preproc(False))
         self.ui.get_result_from_result.clicked.connect(lambda: self.get_result_window(hist=True))
-
 
     def _timedelta_formatter(self, td):
         td_sec = td.seconds
@@ -110,16 +133,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 question_bin_result_data = json.load(dta)
                 question_result_data = self._unbin(question_bin_result_data)
 
-            actual_test = question_result_data['actual_test']
-
             t = dt.strptime(question_result_data['total_time'],"%H:%M:%S.%f")
 
             total_time = f'{t.minute} Минут, {t.second} Секунд'
-            self.ui.type_test_result.setText(self.meta_data_test[actual_test]['description'])
+            self.ui.type_test_result.setText(question_result_data['description'])
             self.ui.time_wasted_result.setText(total_time)
             self.ui.correct_answers_result.setText(f"{question_result_data['right_ans_qty']}/{len(question_result_data['question_data'])}")
 
-        except: pass
+        except Exception as e:
+            print(e)
 
     def change_list_tests(self):
         self.ui.tests_list.clear()
@@ -155,12 +177,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.question = Question_gui(self)
             self.question_data = data
-            self.question.qty_question = len(self.question_data[self.actual_test])
+            self.question.qty_question = len(self.question_pool)
             self.question.set_hist_mode()
         
         self._go_to_screen(self.ui.test_box)
         if not hist: self.question.set_view_mode()
-        self.question.set_next_quest(data = self.question_data[self.actual_test])
+        self.question.set_next_quest()
 
     def _hide_all(self):
         for screen in self.screen_list: screen.hide()
@@ -176,21 +198,23 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.question.active == Status.test:
 
             end_test = dt.now()
-            meta_quest = self.meta_data_test[self.actual_test]
+            self.ui.type_test_label.setText(Actual_test[self.actual_test].value)
+
             total_time = end_test - self.start_test
-            self.ui.type_test_label.setText(meta_quest["description"])
             self.ui.time_wasted_label.setText(self._timedelta_formatter(total_time))
             right_ans_qty = 0
-            for idx, quest in self.question_data[self.actual_test].items():
+            for quest in self.question_pool.values():
                 if quest.answer_result: right_ans_qty += 1
             self.ui.correct_answers_label.setText(f"{right_ans_qty}/{self.question.qty_question}")
 
-            if self.ui.fio_input.text() == "":  fio_dir = "Гость"
-            else:                               fio_dir = self.ui.fio_input.text() 
+            if self.ui.fio_input.text() == "":
+                fio_dir = "Гость"
+            else:
+                fio_dir = self.ui.fio_input.text() 
 
             os.makedirs(f'./result/{fio_dir}', exist_ok=True)
 
-            question_data_dict = self.question_data_to_dict(self.question_data[self.actual_test])
+            question_data_dict = self.question_data_to_dict(self.question_pool)
 
             res = {
                 "start_test":str(self.start_test),
@@ -201,6 +225,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 "question_data":question_data_dict,
                 "fio": fio_dir,
                 "date": str(dt.now()),
+                'description': Actual_test[self.actual_test].value
             }
 
             self.last_fil = f'{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json'
@@ -217,17 +242,18 @@ class MainWindow(QtWidgets.QMainWindow):
         actual_question = self.question.actual_question
         question_start = dt.now()
         while True:
-            if self.end_test == True:
-                return 0
-            if actual_question != self.question.actual_question:
-                return 0
+            if self.test_status == ThereadStatus.stop:return 0
+            if actual_question != self.question.actual_question:return 0
 
-            sleep(1)
+            sleep(0.1)
             delta = dt.now() - question_start
-            print(delta.seconds)
             if delta.seconds >= 30:
-                self._set_next_question()
-                return 0
+                if self.test_status == ThereadStatus.stop:
+                    return 0
+                else:
+                    self.test_status = ThereadStatus.timeout
+                    self._set_next_question()
+                    return 0
 
             self.ui.time_counter.setText(f'На вопрос осталось {30 - delta.seconds} секунд')
 
@@ -236,48 +262,47 @@ class MainWindow(QtWidgets.QMainWindow):
         id_question = self.question.get_actual_question()
         if self.question.active == Status.test:
             answer = self.question.get_answer()
-            question:Question_data = self.question_data[self.actual_test][str(id_question)]
+            question:QuestionPool = self.question_pool[str(id_question)]
             question.choosen_var = answer
             question.answer_result = question.choosen_var == question.right_answers
         if self.question.qty_question > id_question:
-            self.question.set_next_quest(data = self.question_data[self.actual_test])
+            self.test_status = ThereadStatus.stop
+            if self.test_status == ThereadStatus.timeout:
+                return 0
+            try:
+                self.question_timeout_thread.join()
+            except:
+                pass
+            self.question.set_next_quest()
+
+            self.test_status = ThereadStatus.run
             self.question_timeout_thread = Thread(target=self._question_timeout_counter)
-            self.question_timeout_thread.start()         
+            self.question_timeout_thread.start()
         else:
-            self.end_test = True
+            self.test_status = ThereadStatus.stop
             self._end_test()
 
     def _set_prev_question(self):
-        self.question.set_prev_quest(data = self.question_data[self.actual_test])
+        self.question.set_prev_quest()
 
-    def init_question_poll(self) -> dict:
+    def init_question_poll(self):
 
         with open('./config.json', 'r') as fil:
             bin_data = json.load(fil)
-            question_data = self._unbin(bin_data)
+            data = self._unbin(bin_data)
 
-        data = {}
-        meta_data_test = {}
+        if len(data.keys()) >= 10:
+            choises = sample(list(data.keys()), 10)
+        else:
+            choises = sample(list(data.keys()), len(data.keys()))
 
-        for type_test, test in question_data.items():
-            data[type_test] = {}
-
-            meta_data_test[type_test] = {
-                "description": question_data[type_test]["description"],
-                "time": question_data[type_test]["time"]
-            }
+        for idx, key in enumerate(choises,start=1):
             
-            if len(test['poll_questions'].keys()) >= 10:
-                choises = sample(list(test['poll_questions'].keys()), 10)
-            else:
-                choises = sample(list(test['poll_questions'].keys()), len(test['poll_questions'].keys()))
-
-            for idx, tst_key in enumerate(choises,start=1):
-                data_quest = test['poll_questions'][tst_key]
-
-                data[type_test][str(idx)] = Question_data(str(idx), data_quest)
-            print('fffdsf')
-        return data, meta_data_test
+            tmp = data[key]
+            tmp['id_question'] = str(idx)
+            self.question_pool[str(idx)] = QuestionPool(tmp)
+    
+        self.qty_question = len(self.question_pool)
 
     def question_data_to_dict(self, quests):
 
@@ -294,44 +319,27 @@ class MainWindow(QtWidgets.QMainWindow):
             }
         return data
 
-    def run_test_pomdezh_po_chasti(self):
+    def _run_test(self):
 
         self._go_to_screen(self.ui.test_box)
-
         self.question = Question_gui(self)
         self.question.set_test_mode()
-        self.actual_test = "pomdezh_po_chasti"
-        self.question.qty_question = len(self.question_data[self.actual_test])
-        self.question.set_next_quest(self.question_data[self.actual_test])
+        self.question.set_next_quest()
         self.question_timeout_thread = Thread(target=self._question_timeout_counter)
         self.question_timeout_thread.start()
         self.start_test = dt.now()
+
+    def run_test_pomdezh_po_chasti(self):
+        self.actual_test = "pomdezh_po_chasti"
+        self._run_test()
 
     def run_test_dezh_po_chasti(self):
-
-        self._go_to_screen(self.ui.test_box)
-
-        self.question = Question_gui(self)
-        self.question.set_test_mode()
         self.actual_test = "dezh_po_chasti"
-        self.question.qty_question = len(self.question_data[self.actual_test])
-        self.question.set_next_quest(self.question_data[self.actual_test])
-        self.question_timeout_thread = Thread(target=self._question_timeout_counter)
-        self.question_timeout_thread.start()
-        self.start_test = dt.now()
+        self._run_test()
 
     def run_test_instructions_DPCH_PDT(self):
-
-        self._go_to_screen(self.ui.test_box)
-
-        self.question = Question_gui(self)
-        self.question.set_test_mode()
         self.actual_test = "instructions_DPCH_PDT"
-        self.question.qty_question = len(self.question_data[self.actual_test])
-        self.question.set_next_quest(self.question_data[self.actual_test])
-        self.question_timeout_thread = Thread(target=self._question_timeout_counter)
-        self.question_timeout_thread.start()
-        self.start_test = dt.now()
+        self._run_test()
 
     def _get_report(self):
 

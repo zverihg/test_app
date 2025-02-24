@@ -29,29 +29,13 @@
     <property name="title">
      <string/>
     </property>
-    <widget class="QComboBox" name="type_test_choose">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>321</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-    </widget>
     <widget class="QListWidget" name="list_questions">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>50</y>
        <width>321</width>
-       <height>591</height>
+       <height>611</height>
       </rect>
      </property>
      <property name="font">
@@ -294,6 +278,36 @@ border-radius: 10px;</string>
      </property>
      <property name="text">
       <string>сохранить вопрос</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>23</y>
+       <width>311</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">text-align: center;</string>
+     </property>
+     <property name="text">
+      <string>Список вопросов</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </widget>

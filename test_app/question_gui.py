@@ -1,11 +1,7 @@
 from PyQt5.QtWidgets import * 
 from PyQt5.QtGui import *
 from enum import Enum
-from question_data import Question_data
-from threading import Thread
-from time import sleep
-from datetime import datetime as dt
-
+import time
 class Status(Enum):
     hist = 1
     test = 2
@@ -16,6 +12,7 @@ class Question_gui():
         Класс для управления GUI теста
     '''
 
+    question_pool:dict = {}
 
     active:Status = Status.hist
     actual_question:int = 0
@@ -35,22 +32,23 @@ class Question_gui():
     previous_question:QPushButton
     answer_var_list:list
 
-    def __init__(self,main_win):
+    def __init__(self, main_win):
 
         self.choose_answer_1 = main_win.ui.choose_answer_1
         self.choose_answer_2 = main_win.ui.choose_answer_2
         self.choose_answer_3 = main_win.ui.choose_answer_3
         self.choose_answer_4 = main_win.ui.choose_answer_4
 
-        self.answer_var_1 = main_win.ui.answer_var_1
-        self.answer_var_2 = main_win.ui.answer_var_2
-        self.answer_var_3 = main_win.ui.answer_var_3
-        self.answer_var_4 = main_win.ui.answer_var_4
+        self.answer_var_1:QLabel = main_win.ui.answer_var_1
+        self.answer_var_2:QLabel = main_win.ui.answer_var_2
+        self.answer_var_3:QLabel = main_win.ui.answer_var_3
+        self.answer_var_4:QLabel = main_win.ui.answer_var_4
         
         self.question_text = main_win.ui.question_text
         self.qty_question_label = main_win.ui.qty_question_label
         self.previous_question = main_win.ui.previous_question
-        
+        self.qty_question = main_win.qty_question
+        self.question_pool = main_win.question_pool
         self.answer_var_list = [
                 ['1',self.answer_var_1],
                 ['2',self.answer_var_2],
@@ -62,6 +60,16 @@ class Question_gui():
 
     def reset_actual_question(self): self.actual_question = 0
 
+    def _fix_styles(self):
+        for label in self.answer_var_list:
+            label[-1].setStyleSheet(
+            '''
+                background-color: rgb(255, 255, 255);
+                border-radius: 20px;
+                padding-left:10px
+            '''
+            )
+
     def set_view_mode(self):
         self.choose_answer_1.setEnabled(False)
         self.choose_answer_2.setEnabled(False)
@@ -69,7 +77,6 @@ class Question_gui():
         self.choose_answer_4.setEnabled(False)
         self.previous_question.show()
         self.active = Status.view
-
 
     def set_hist_mode(self):
         self.choose_answer_1.setEnabled(False)
@@ -87,7 +94,7 @@ class Question_gui():
         self.previous_question.hide()
         self.active = Status.test
 
-    def set_prev_quest(self, data):
+    def set_prev_quest(self):
 
         for itm in self.answer_var_list: itm[1].setStyleSheet("")
 
@@ -96,7 +103,7 @@ class Question_gui():
         else:
             self.actual_question -=1
             
-            now_quest = data[str(self.actual_question)]
+            now_quest = self.question_pool[str(self.actual_question)]
 
             self.answer_var_1.setText(now_quest.answers['1'])
             self.answer_var_2.setText(now_quest.answers['2'])
@@ -117,12 +124,12 @@ class Question_gui():
                     else:
                         itm[1].setStyleSheet("")
 
-    def set_next_quest(self, data):
+    def set_next_quest(self):
 
         for itm in self.answer_var_list: itm[1].setStyleSheet("")
 
         self.actual_question +=1
-        now_quest = data[str(self.actual_question)]
+        now_quest = self.question_pool[str(self.actual_question)]
 
         self.answer_var_1.setText(now_quest.answers['1'])
         self.answer_var_2.setText(now_quest.answers['2'])
@@ -142,6 +149,8 @@ class Question_gui():
                     itm[1].setStyleSheet("color: rgb(255, 0, 4);")
                 else:
                     itm[1].setStyleSheet("")
+
+        self._fix_styles()
 
     def get_answer(self):
 

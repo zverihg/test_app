@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1171, 721)
+        MainWindow.resize(1154, 721)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -73,9 +73,17 @@ class Ui_MainWindow(object):
         font.setPointSize(19)
         self.test_button.setFont(font)
         self.test_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.test_button.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.test_button.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.test_button.setObjectName("test_button")
         self.verticalLayout_2.addWidget(self.test_button)
         self.result_button = QtWidgets.QPushButton(self.verticalLayoutWidget_2)
@@ -83,9 +91,17 @@ class Ui_MainWindow(object):
         font.setPointSize(19)
         self.result_button.setFont(font)
         self.result_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.result_button.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.result_button.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.result_button.setObjectName("result_button")
         self.verticalLayout_2.addWidget(self.result_button)
         self.test_menu = QtWidgets.QGroupBox(self.centralwidget)
@@ -114,9 +130,17 @@ class Ui_MainWindow(object):
         self.dezh_po_chasti.setFont(font)
         self.dezh_po_chasti.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.dezh_po_chasti.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.dezh_po_chasti.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.dezh_po_chasti.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.dezh_po_chasti.setFlat(False)
         self.dezh_po_chasti.setObjectName("dezh_po_chasti")
         self.verticalLayout.addWidget(self.dezh_po_chasti)
@@ -126,9 +150,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.pom_dezh_po_chasti.setFont(font)
         self.pom_dezh_po_chasti.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.pom_dezh_po_chasti.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.pom_dezh_po_chasti.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.pom_dezh_po_chasti.setObjectName("pom_dezh_po_chasti")
         self.verticalLayout.addWidget(self.pom_dezh_po_chasti)
         self.instructions_DPCH_PDT = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -137,9 +169,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.instructions_DPCH_PDT.setFont(font)
         self.instructions_DPCH_PDT.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.instructions_DPCH_PDT.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.instructions_DPCH_PDT.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.instructions_DPCH_PDT.setObjectName("instructions_DPCH_PDT")
         self.verticalLayout.addWidget(self.instructions_DPCH_PDT)
         self.back_to_main_window = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -148,9 +188,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.back_to_main_window.setFont(font)
         self.back_to_main_window.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.back_to_main_window.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.back_to_main_window.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.back_to_main_window.setObjectName("back_to_main_window")
         self.verticalLayout.addWidget(self.back_to_main_window)
         self.test_box = QtWidgets.QGroupBox(self.centralwidget)
@@ -172,23 +220,25 @@ class Ui_MainWindow(object):
         self.question_text.setWordWrap(True)
         self.question_text.setObjectName("question_text")
         self.verticalLayoutWidget_3 = QtWidgets.QWidget(self.test_box)
-        self.verticalLayoutWidget_3.setGeometry(QtCore.QRect(80, 190, 1054, 461))
+        self.verticalLayoutWidget_3.setGeometry(QtCore.QRect(80, 190, 1071, 461))
         self.verticalLayoutWidget_3.setObjectName("verticalLayoutWidget_3")
         self.question_list_layout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_3)
+        self.question_list_layout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.question_list_layout.setContentsMargins(0, 0, 0, 0)
+        self.question_list_layout.setSpacing(6)
         self.question_list_layout.setObjectName("question_list_layout")
         self.question_box_1 = QtWidgets.QHBoxLayout()
         self.question_box_1.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.question_box_1.setObjectName("question_box_1")
         self.answer_var_1 = QtWidgets.QLabel(self.verticalLayoutWidget_3)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.answer_var_1.sizePolicy().hasHeightForWidth())
         self.answer_var_1.setSizePolicy(sizePolicy)
-        self.answer_var_1.setMinimumSize(QtCore.QSize(950, 0))
+        self.answer_var_1.setMinimumSize(QtCore.QSize(1040, 108))
         self.answer_var_1.setMaximumSize(QtCore.QSize(950, 16777215))
-        self.answer_var_1.setMouseTracking(True)
+        self.answer_var_1.setMouseTracking(False)
         self.answer_var_1.setAutoFillBackground(False)
         self.answer_var_1.setStyleSheet("background-color: rgb(255, 255, 255);\n"
 "border-radius: 20px;\n"
@@ -205,7 +255,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.choose_answer_1.sizePolicy().hasHeightForWidth())
         self.choose_answer_1.setSizePolicy(sizePolicy)
-        self.choose_answer_1.setMaximumSize(QtCore.QSize(44, 16777215))
+        self.choose_answer_1.setMaximumSize(QtCore.QSize(16, 16777215))
         self.choose_answer_1.setText("")
         self.choose_answer_1.setObjectName("choose_answer_1")
         self.question_box_1.addWidget(self.choose_answer_1)
@@ -218,7 +268,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.answer_var_2.sizePolicy().hasHeightForWidth())
         self.answer_var_2.setSizePolicy(sizePolicy)
-        self.answer_var_2.setMinimumSize(QtCore.QSize(950, 0))
+        self.answer_var_2.setMinimumSize(QtCore.QSize(1040, 108))
         self.answer_var_2.setMaximumSize(QtCore.QSize(950, 16777215))
         self.answer_var_2.setMouseTracking(True)
         self.answer_var_2.setAutoFillBackground(False)
@@ -237,7 +287,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.choose_answer_2.sizePolicy().hasHeightForWidth())
         self.choose_answer_2.setSizePolicy(sizePolicy)
-        self.choose_answer_2.setMaximumSize(QtCore.QSize(44, 16777215))
+        self.choose_answer_2.setMaximumSize(QtCore.QSize(16, 16777215))
         self.choose_answer_2.setText("")
         self.choose_answer_2.setObjectName("choose_answer_2")
         self.question_box_2.addWidget(self.choose_answer_2)
@@ -250,7 +300,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.answer_var_3.sizePolicy().hasHeightForWidth())
         self.answer_var_3.setSizePolicy(sizePolicy)
-        self.answer_var_3.setMinimumSize(QtCore.QSize(950, 0))
+        self.answer_var_3.setMinimumSize(QtCore.QSize(1040, 108))
         self.answer_var_3.setMaximumSize(QtCore.QSize(950, 16777215))
         self.answer_var_3.setAutoFillBackground(False)
         self.answer_var_3.setStyleSheet("background-color: rgb(255, 255, 255);\n"
@@ -268,7 +318,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.choose_answer_3.sizePolicy().hasHeightForWidth())
         self.choose_answer_3.setSizePolicy(sizePolicy)
-        self.choose_answer_3.setMaximumSize(QtCore.QSize(44, 16777215))
+        self.choose_answer_3.setMaximumSize(QtCore.QSize(16, 16777215))
         self.choose_answer_3.setText("")
         self.choose_answer_3.setObjectName("choose_answer_3")
         self.question_box_3.addWidget(self.choose_answer_3)
@@ -281,7 +331,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.answer_var_4.sizePolicy().hasHeightForWidth())
         self.answer_var_4.setSizePolicy(sizePolicy)
-        self.answer_var_4.setMinimumSize(QtCore.QSize(950, 0))
+        self.answer_var_4.setMinimumSize(QtCore.QSize(1040, 108))
         self.answer_var_4.setMaximumSize(QtCore.QSize(950, 16777215))
         self.answer_var_4.setAutoFillBackground(False)
         self.answer_var_4.setStyleSheet("background-color: rgb(255, 255, 255);\n"
@@ -299,7 +349,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.choose_answer_4.sizePolicy().hasHeightForWidth())
         self.choose_answer_4.setSizePolicy(sizePolicy)
-        self.choose_answer_4.setMaximumSize(QtCore.QSize(44, 16777215))
+        self.choose_answer_4.setMaximumSize(QtCore.QSize(16, 16777215))
         self.choose_answer_4.setText("")
         self.choose_answer_4.setObjectName("choose_answer_4")
         self.question_box_4.addWidget(self.choose_answer_4)
@@ -307,9 +357,17 @@ class Ui_MainWindow(object):
         self.next_question = QtWidgets.QPushButton(self.test_box)
         self.next_question.setGeometry(QtCore.QRect(880, 660, 231, 41))
         self.next_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.next_question.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.next_question.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.next_question.setObjectName("next_question")
         self.qty_question_label = QtWidgets.QLabel(self.test_box)
         self.qty_question_label.setGeometry(QtCore.QRect(800, 670, 61, 31))
@@ -327,9 +385,17 @@ class Ui_MainWindow(object):
         self.previous_question = QtWidgets.QPushButton(self.test_box)
         self.previous_question.setGeometry(QtCore.QRect(80, 660, 231, 41))
         self.previous_question.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.previous_question.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.previous_question.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.previous_question.setObjectName("previous_question")
         self.test_result_box = QtWidgets.QGroupBox(self.centralwidget)
         self.test_result_box.setGeometry(QtCore.QRect(0, 0, 1171, 721))
@@ -415,9 +481,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.get_export.setFont(font)
         self.get_export.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.get_export.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.get_export.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.get_export.setObjectName("get_export")
         self.verticalLayout_3.addWidget(self.get_export)
         self.get_result = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
@@ -430,9 +504,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.get_result.setFont(font)
         self.get_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.get_result.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.get_result.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.get_result.setObjectName("get_result")
         self.verticalLayout_3.addWidget(self.get_result)
         self.back_main_menu = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
@@ -447,9 +529,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.back_main_menu.setFont(font)
         self.back_main_menu.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.back_main_menu.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.back_main_menu.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.back_main_menu.setObjectName("back_main_menu")
         self.verticalLayout_3.addWidget(self.back_main_menu)
         self.test_result_box_menue = QtWidgets.QGroupBox(self.centralwidget)
@@ -549,9 +639,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.get_export_result.setFont(font)
         self.get_export_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.get_export_result.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.get_export_result.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.get_export_result.setObjectName("get_export_result")
         self.verticalLayout_4.addWidget(self.get_export_result)
         self.get_result_from_result = QtWidgets.QPushButton(self.verticalLayoutWidget_5)
@@ -564,9 +662,17 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.get_result_from_result.setFont(font)
         self.get_result_from_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.get_result_from_result.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.get_result_from_result.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.get_result_from_result.setObjectName("get_result_from_result")
         self.verticalLayout_4.addWidget(self.get_result_from_result)
         self.back_main_menu_result = QtWidgets.QPushButton(self.verticalLayoutWidget_5)
@@ -581,16 +687,24 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.back_main_menu_result.setFont(font)
         self.back_main_menu_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.back_main_menu_result.setStyleSheet("background-color: #0171CA;\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.back_main_menu_result.setStyleSheet("    QPushButton {\n"
+"        background-color: #0171CA;\n"
+"        color: rgb(255, 255, 255);\n"
+"        border-radius: 10px;\n"
+"    }\n"
+"    QPushButton:hover {\n"
+"        background: rgba(0,0,0,0);\n"
+"        color: #3a7999;\n"
+"         border : 2px solid ;\n"
+"        border-color: #0171CA;\n"
+"    }")
         self.back_main_menu_result.setObjectName("back_main_menu_result")
         self.verticalLayout_4.addWidget(self.back_main_menu_result)
-        self.main_layout.raise_()
-        self.test_box.raise_()
         self.test_menu.raise_()
         self.test_result_box.raise_()
         self.test_result_box_menue.raise_()
+        self.main_layout.raise_()
+        self.test_box.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
