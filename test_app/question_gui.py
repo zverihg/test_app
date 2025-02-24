@@ -161,3 +161,7 @@ class Question_gui():
         if self.choose_answer_4.isChecked(): data.append('4')
 
         return data
+
+
+if __name__ == "__main__":
+    import main

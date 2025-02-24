@@ -58,7 +58,7 @@ class MainWindow(QtWidgets.QMainWindow):
     test_status:ThereadStatus = ThereadStatus.run
 
     last_fio:str=''
-    last_fil:str=''
+    last_file:str=''
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -80,12 +80,10 @@ class MainWindow(QtWidgets.QMainWindow):
         ]
 
         self._connect_clicks()
-        self.init_question_poll()
         self._go_to_screen(self.ui.main_layout)
 
         self.ui.folder_list.currentTextChanged.connect(self.change_list_tests)
         self.ui.tests_list.currentItemChanged.connect(self.get_test_result)
-
 
     def _resource_path(self, relative_path):
         try:
@@ -164,8 +162,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if hist:
             test_path = f'./result/{self.ui.folder_list.currentText()}/{self.ui.tests_list.currentItem().text()}'
-            with open(test_path, "r") as dta: 
-                
+            with open(test_path, "r") as dta:
                 question_bin_data = json.load(dta)
                 question_data = self._unbin(question_bin_data)
 
@@ -173,8 +170,8 @@ class MainWindow(QtWidgets.QMainWindow):
             data = { self.actual_test: {} }
 
             for idx, data_quest in question_data['question_data'].items():
-                data[self.actual_test][idx] = Question_data(idx, data_quest)
-
+                self.question_pool[str(idx)] = QuestionPool(data_quest)
+        
             self.question = Question_gui(self)
             self.question_data = data
             self.question.qty_question = len(self.question_pool)
@@ -228,10 +225,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 'description': Actual_test[self.actual_test].value
             }
 
-            self.last_fil = f'{self.actual_test}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json'
             self.last_fio = fio_dir
+            self.last_file = f'{Actual_test[self.actual_test].value}_{fio_dir}_{dt.now().strftime("%d_%M_%Y_%H_%M_%S")}.json'
 
-            with open(f'./result/{self.last_fio}/{self.last_fil}', 'w') as fp:
+            with open(f'./result/{self.last_fio}/{self.last_file}', 'w') as fp:
                 json.dump(self._onbin(res),fp)
 
         elif self.question.active == Status.hist:
@@ -320,7 +317,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return data
 
     def _run_test(self):
-
+        self.init_question_poll()
         self._go_to_screen(self.ui.test_box)
         self.question = Question_gui(self)
         self.question.set_test_mode()
@@ -343,14 +340,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _get_report(self):
 
-        with open(f'./result/{self.last_fio}/{self.last_fil}', 'r') as fil:
+        with open(f'./result/{self.last_fio}/{self.last_file}', 'r') as fil:
             bin_data = json.load(fil)
             question_data = self._unbin(bin_data)
 
         type_test =  Actual_test[question_data['actual_test']].value
+
         t = dt.strptime(question_data['total_time'],"%H:%M:%S.%f")
         total_time = f'{t.minute} Минут, {t.second} Секунд'
 
+        test_date = dt.strptime(question_data['date'],"%Y-%m-%d %H:%M:%S.%f")
+        test_date_str = test_date.strftime("%Y-%m-%d %H:%M:%S")
         pdf = FPDF()
         pdf.add_page()
 
@@ -360,7 +360,7 @@ class MainWindow(QtWidgets.QMainWindow):
         pdf.set_font("DejaVu", size=12)
         pdf.cell(200, 10, txt=f"ФИО: {question_data['fio']}", ln=1, align="L")
         pdf.cell(200, 10, txt=f"Тип теста: {type_test}", ln=1, align="L")
-        pdf.cell(200, 10, txt=f"Дата: {question_data['date']}", ln=1, align="L")
+        pdf.cell(200, 10, txt=f"Дата: {test_date_str}", ln=1, align="L")
         pdf.cell(200, 10, txt=f"Время теста: {total_time}", ln=1, align="L")
         pdf.cell(200, 10, txt=f"Количество правильных ответов: {question_data['right_ans_qty']}", ln=1, align="L")
 
@@ -375,6 +375,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             pdf.cell(200, 10, txt="", ln=1, align="C")
             pdf.cell(200, 10, txt=f"Вопрос: {idx}", ln=1, align="C")
+            pdf.cell(200, 10, txt=question['question'], ln=1, align="C")
 
             pdf.set_font("DejaVu", size=12)
 
@@ -387,8 +388,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         pdf.set_text_color(0, 0, 0)
                 else:
                     pdf.set_text_color(0, 0, 0)
-                
-                pdf.cell(200, 10, txt=f"{ans_val}", ln=1, align="L")
+
+                pdf.multi_cell(0, 10, txt=f"{ans_val}", align="L")
 
         pdf.output(f"./export/{type_test}_{self.last_fio}.pdf")
 
@@ -396,7 +397,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if end_test:
             self.last_fio = self.ui.folder_list.currentText()
-            self.last_fil = self.ui.tests_list.currentItem().text()
+            self.last_file = self.ui.tests_list.currentItem().text()
 
         self._get_report()
 
