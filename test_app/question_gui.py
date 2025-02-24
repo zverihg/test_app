@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import * 
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from enum import Enum
 import time
@@ -43,7 +43,7 @@ class Question_gui():
         self.answer_var_2:QLabel = main_win.ui.answer_var_2
         self.answer_var_3:QLabel = main_win.ui.answer_var_3
         self.answer_var_4:QLabel = main_win.ui.answer_var_4
-        
+
         self.question_text = main_win.ui.question_text
         self.qty_question_label = main_win.ui.qty_question_label
         self.previous_question = main_win.ui.previous_question
@@ -102,7 +102,7 @@ class Question_gui():
             pass
         else:
             self.actual_question -=1
-            
+
             now_quest = self.question_pool[str(self.actual_question)]
 
             self.answer_var_1.setText(now_quest.answers['1'])

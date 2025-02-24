@@ -1,0 +1,82 @@
+default_language_version:
+    python: python3
+
+
+default_stages: [commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: double-quote-string-fixer
+      - id: check-ast
+      - id: check-json
+      - id: pretty-format-json
+        args: [
+          --autofix,
+        ]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+      - id: pyupgrade
+        name: PyUpgrade
+        args: [--py311-plus]
+
+  - repo: https://github.com/myint/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        name: Autoflake
+        args: [
+            --in-place,
+            --remove-all-unused-imports,
+            --ignore-init-module-imports,
+            --remove-unused-variables,
+        ]
+
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+      - id: add-trailing-comma
+        args: [--py36-plus]
+
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.5.0
+    hooks:
+      - id: yesqa
+
+  - repo: https://github.com/myint/docformatter
+    rev: v1.5.1
+    hooks:
+      - id: docformatter
+        name: Docstring formatter
+        args: [
+            --in-place,
+            --make-summary-multi-line,
+        ]
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        name: Flake8
+        args: [
+          --config=.flake8,
+          --max-line-length=120,
+        ]
+        exclude: .git|__pycache__
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: Isort
+        additional_dependencies: [toml]
+        exclude: ^.*/?setup\.py$|^.*/?__init__\.py$
+        args: [
+          --sp=.isort.cfg,
+        ]

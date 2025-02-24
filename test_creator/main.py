@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from PyQt5.QtWidgets import * 
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys, os
 from PyQt5 import QtWidgets
@@ -75,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _unbin(self, a ): return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
 
     def del_question(self):
-        
+
         idx_question = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
 
         self.question_pool.pop(idx_question)
@@ -98,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
             idx = self.ui.list_questions.item(len(self.ui.list_questions)-1).text().replace("Вопрос ", "")
         except:
             idx = "0"
-        
+
         idx = str(int(idx)+1)
         data = {
             'id_question':idx,
@@ -114,7 +114,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for itm in self.chooses_lst.values(): itm.setChecked(False)
         for itm in self.ans_lst.values(): itm.setText("")
         idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
-        
+
         quest = self.question_pool[idx_quest]
         self.ui.test_question.setText(quest.question)
 
@@ -188,7 +188,7 @@ class MainWindow(QtWidgets.QMainWindow):
         finally:
             self.set_question_list_gui()
             self.clicked_on_row()
-            
+
     def save_question(self):
 
         if self.ui.list_questions.currentItem():
@@ -206,7 +206,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     msg.setIcon(QMessageBox.Critical)
                     msg.setInformativeText('Все поля должны быть заполнены')
                     msg.exec_()
-                    return 0 
+                    return 0
 
             chooses = {
                 '1':self.ui.choose_1.checkState(),

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from PyQt5.QtWidgets import * 
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys, os
 from PyQt5 import QtWidgets
@@ -171,16 +171,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
             for idx, data_quest in question_data['question_data'].items():
                 self.question_pool[str(idx)] = QuestionPool(data_quest)
-        
+
             self.question = Question_gui(self)
             self.question_data = data
             self.question.qty_question = len(self.question_pool)
             self.question.set_hist_mode()
-        
+
         self._go_to_screen(self.ui.test_box)
         if not hist: self.question.set_view_mode()
         self.question.set_next_quest()
-
 
     def _hide_all(self):
         for screen in self.screen_list: screen.hide()
@@ -208,7 +207,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.ui.fio_input.text() == "":
                 fio_dir = "Гость"
             else:
-                fio_dir = self.ui.fio_input.text() 
+                fio_dir = self.ui.fio_input.text()
 
             os.makedirs(f'./result/{fio_dir}', exist_ok=True)
 
@@ -295,11 +294,11 @@ class MainWindow(QtWidgets.QMainWindow):
             choises = sample(list(data.keys()), len(data.keys()))
 
         for idx, key in enumerate(choises,start=1):
-            
+
             tmp = data[key]
             tmp['id_question'] = str(idx)
             self.question_pool[str(idx)] = QuestionPool(tmp)
-    
+
         self.qty_question = len(self.question_pool)
 
     def question_data_to_dict(self, quests):
@@ -399,7 +398,6 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.setInformativeText('Готово')
         msg.StandardButton(QMessageBox.Ok)
         msg.exec_()
-
 
     def get_report_preproc(self, end_test):
 

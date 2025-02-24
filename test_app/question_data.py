@@ -1,6 +1,6 @@
 class Question_data():
     '''
-        Данные из JSON файла 
+        Данные из JSON файла
     '''
     id_question:int
     question:str
@@ -15,5 +15,4 @@ class Question_data():
         self.right_answers = data["right_answers"]
         self.question = data["question"]
         if 'choosen_var' in data:
-            self.choosen_var = data['choosen_var'] 
-
+            self.choosen_var = data['choosen_var']
