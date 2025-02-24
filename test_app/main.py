@@ -45,9 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     question_pool:dict = {}
     qty_question:int = 0
-
-    # meta_data_test: dict = {}
-    question_list:dict = {}
     question:Question_gui
     actual_test:str = ''
     start_test: dt = None
@@ -149,6 +146,9 @@ class MainWindow(QtWidgets.QMainWindow):
         data_fil = [f for f in files if os.path.isfile(f'./result/{dir}/{f}')]
         self.ui.tests_list.addItems(data_fil)
 
+        item = self.ui.tests_list.item(0)
+        self.ui.tests_list.setCurrentItem(item)
+
     def init_result_menue(self):
         self.ui.folder_list.clear()
         self.result_data = {}
@@ -180,6 +180,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._go_to_screen(self.ui.test_box)
         if not hist: self.question.set_view_mode()
         self.question.set_next_quest()
+
 
     def _hide_all(self):
         for screen in self.screen_list: screen.hide()
@@ -393,12 +394,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         pdf.output(f"./export/{type_test}_{self.last_fio}.pdf")
 
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setInformativeText('Готово')
+        msg.StandardButton(QMessageBox.Ok)
+        msg.exec_()
+
+
     def get_report_preproc(self, end_test):
 
         if end_test:
             self.last_fio = self.ui.folder_list.currentText()
             self.last_file = self.ui.tests_list.currentItem().text()
-
         self._get_report()
 
 app = QtWidgets.QApplication(sys.argv)
