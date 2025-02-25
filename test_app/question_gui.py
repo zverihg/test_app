@@ -32,6 +32,19 @@ class Question_gui():
     previous_question:QPushButton
     answer_var_list:list
 
+    red_style:str = '''
+                color: rgb(255, 0, 4);
+                background-color: rgb(255, 255, 255);
+                border-radius: 20px;
+                padding-left:10px
+            '''
+    dafault_style:str = '''
+                background-color: rgb(255, 255, 255);
+                border-radius: 20px;
+                padding-left:10px
+            '''
+
+
     def __init__(self, main_win):
 
         self.choose_answer_1 = main_win.ui.choose_answer_1
@@ -59,16 +72,6 @@ class Question_gui():
     def get_actual_question(self): return self.actual_question
 
     def reset_actual_question(self): self.actual_question = 0
-
-    def _fix_styles(self):
-        for label in self.answer_var_list:
-            label[-1].setStyleSheet(
-            '''
-                background-color: rgb(255, 255, 255);
-                border-radius: 20px;
-                padding-left:10px
-            '''
-            )
 
     def set_view_mode(self):
         self.choose_answer_1.setEnabled(False)
@@ -98,10 +101,10 @@ class Question_gui():
 
         for itm in self.answer_var_list: itm[1].setStyleSheet("")
 
-        if self.actual_question ==1:
+        if self.actual_question == 1:
             pass
         else:
-            self.actual_question -=1
+            self.actual_question -= 1
 
             now_quest = self.question_pool[str(self.actual_question)]
 
@@ -120,9 +123,10 @@ class Question_gui():
             if self.active in [Status.view, Status.hist]:
                 for itm in self.answer_var_list:
                     if itm[0] in now_quest.choosen_var and itm[0] not in now_quest.right_answers:
-                        itm[1].setStyleSheet("color: rgb(255, 0, 4);")
+                        itm[1].setStyleSheet(self.red_style)
                     else:
-                        itm[1].setStyleSheet("")
+                        itm[1].setStyleSheet(self.dafault_style)
+
 
     def set_next_quest(self):
 
@@ -146,11 +150,9 @@ class Question_gui():
         if self.active in [Status.view, Status.hist]:
             for itm in self.answer_var_list:
                 if itm[0] in now_quest.choosen_var and itm[0] not in now_quest.right_answers:
-                    itm[1].setStyleSheet("color: rgb(255, 0, 4);")
+                    itm[1].setStyleSheet(self.red_style)
                 else:
-                    itm[1].setStyleSheet("")
-
-        self._fix_styles()
+                    itm[1].setStyleSheet(self.dafault_style)
 
     def get_answer(self):
 

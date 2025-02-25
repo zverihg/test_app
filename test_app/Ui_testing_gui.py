@@ -53,13 +53,23 @@ class Ui_MainWindow(object):
 "padding-left:10px")
         self.fio_label.setObjectName("fio_label")
         self.horizontalLayout.addWidget(self.fio_label)
-        self.fio_input = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
+        self.fio_input = QtWidgets.QComboBox(self.verticalLayoutWidget_2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.fio_input.sizePolicy().hasHeightForWidth())
+        self.fio_input.setSizePolicy(sizePolicy)
+        self.fio_input.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setPointSize(19)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.fio_input.setFont(font)
+        self.fio_input.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
         self.fio_input.setStyleSheet("background-color: rgb(255, 255, 255);\n"
 "border-radius: 20px;\n"
-"padding-left:10px")
+"padding-left:10px;\n"
+"font: 19pt \"MS Shell Dlg 2\";")
+        self.fio_input.setEditable(True)
         self.fio_input.setObjectName("fio_input")
         self.horizontalLayout.addWidget(self.fio_input)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
@@ -703,8 +713,8 @@ class Ui_MainWindow(object):
         self.test_menu.raise_()
         self.test_result_box.raise_()
         self.test_result_box_menue.raise_()
-        self.main_layout.raise_()
         self.test_box.raise_()
+        self.main_layout.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -714,6 +724,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.fio_label.setText(_translate("MainWindow", "Введите ФИО"))
+        self.fio_input.setCurrentText(_translate("MainWindow", "Гость"))
         self.test_button.setText(_translate("MainWindow", "Тестирование"))
         self.result_button.setText(_translate("MainWindow", "Просмотр результатов"))
         self.dezh_po_chasti.setText(_translate("MainWindow", "Дежурный по части"))

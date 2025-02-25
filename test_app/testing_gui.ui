@@ -83,16 +83,39 @@ padding-left:10px</string>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="fio_input">
+         <widget class="QComboBox" name="fio_input">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>19</pointsize>
+            <stylestrategy>PreferAntialias</stylestrategy>
            </font>
+          </property>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 255, 255);
 border-radius: 20px;
-padding-left:10px</string>
+padding-left:10px;
+font: 19pt &quot;MS Shell Dlg 2&quot;;</string>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentText">
+           <string>Гость</string>
           </property>
          </widget>
         </item>
@@ -1323,8 +1346,8 @@ padding-left:10px</string>
    <zorder>test_menu</zorder>
    <zorder>test_result_box</zorder>
    <zorder>test_result_box_menue</zorder>
-   <zorder>main_layout</zorder>
    <zorder>test_box</zorder>
+   <zorder>main_layout</zorder>
   </widget>
  </widget>
  <resources/>

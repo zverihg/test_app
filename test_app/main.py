@@ -29,6 +29,8 @@ class QuestionPool():
         self.question = data['question']
         self.answers = data['answers']
         self.right_answers = data['right_answers']
+        self.choosen_var = data['choosen_var']
+        self.answer_result = data['answer_result']
 
 class Actual_test(Enum):
     pomdezh_po_chasti = "Помошник дежурного по части"
@@ -65,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle('Приложение для тестирования')
+        self.setWindowTitle('Приложение для администратора')
         self.setWindowIcon(QIcon(self._resource_path('i.png')))
 
         self.screen_list = [
@@ -81,6 +83,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.folder_list.currentTextChanged.connect(self.change_list_tests)
         self.ui.tests_list.currentItemChanged.connect(self.get_test_result)
+
+        dirs = os.listdir(path='./result')
+        self.ui.fio_input.addItems(dirs)
 
     def _resource_path(self, relative_path):
         try:
@@ -204,14 +209,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 if quest.answer_result: right_ans_qty += 1
             self.ui.correct_answers_label.setText(f"{right_ans_qty}/{self.question.qty_question}")
 
-            if self.ui.fio_input.text() == "":
+            if self.ui.fio_input.currentText() == "":
                 fio_dir = "Гость"
             else:
-                fio_dir = self.ui.fio_input.text()
+                fio_dir = self.ui.fio_input.currentText()
 
             os.makedirs(f'./result/{fio_dir}', exist_ok=True)
 
             question_data_dict = self.question_data_to_dict(self.question_pool)
+
+            if right_ans_qty >=8:
+                grade = 5
+            elif right_ans_qty < 8 and right_ans_qty >= 6:
+                grade = 4
+            elif right_ans_qty < 6 and right_ans_qty >= 5:
+                grade = 3
+            else:
+                grade = 2
 
             res = {
                 "start_test":str(self.start_test),
@@ -221,6 +235,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 "right_ans_qty": right_ans_qty,
                 "question_data":question_data_dict,
                 "fio": fio_dir,
+                "grade": grade,
                 "date": str(dt.now()),
                 'description': Actual_test[self.actual_test].value
             }
@@ -257,21 +272,26 @@ class MainWindow(QtWidgets.QMainWindow):
     def _set_next_question(self):
 
         id_question = self.question.get_actual_question()
+        if not self.question.active == Status.test:
+
+            if self.question.qty_question > id_question:
+                self.question.set_next_quest()
+            else:
+                self._end_test()
+            return 0
+
         if self.question.active == Status.test:
             answer = self.question.get_answer()
             question:QuestionPool = self.question_pool[str(id_question)]
             question.choosen_var = answer
             question.answer_result = question.choosen_var == question.right_answers
         if self.question.qty_question > id_question:
-            self.test_status = ThereadStatus.stop
-            if self.test_status == ThereadStatus.timeout:
-                return 0
-            try:
-                self.question_timeout_thread.join()
-            except:
-                pass
-            self.question.set_next_quest()
 
+            self.test_status = ThereadStatus.stop
+            if self.test_status == ThereadStatus.timeout: return 0
+            try: self.question_timeout_thread.join()
+            except: pass
+            self.question.set_next_quest()
             self.test_status = ThereadStatus.run
             self.question_timeout_thread = Thread(target=self._question_timeout_counter)
             self.question_timeout_thread.start()
