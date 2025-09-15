@@ -31,7 +31,7 @@
 
 <h3>Зависимости</h3>
 
-    -python 3.12
+    -python 3.8
     -pyinstaller
     -PyQt5
 
