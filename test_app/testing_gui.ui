@@ -98,7 +98,11 @@ padding-left:10px</string>
           </property>
           <property name="font">
            <font>
+            <family>MS Shell Dlg 2</family>
             <pointsize>19</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
             <stylestrategy>PreferAntialias</stylestrategy>
            </font>
           </property>
@@ -225,7 +229,7 @@ font: 19pt &quot;MS Shell Dlg 2&quot;;</string>
        <x>330</x>
        <y>150</y>
        <width>511</width>
-       <height>301</height>
+       <height>440</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -334,6 +338,74 @@ font: 19pt &quot;MS Shell Dlg 2&quot;;</string>
         </property>
         <property name="text">
          <string>Инструкции ДПЧ и ПДТ</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="dezh_po_parku">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>68</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">    QPushButton {
+        background-color: #0171CA;
+        color: rgb(255, 255, 255);
+        border-radius: 10px;
+    }
+    QPushButton:hover {
+        background: rgba(0,0,0,0);
+        color: #3a7999;
+		 border : 2px solid ;
+        border-color: #0171CA;
+    }</string>
+        </property>
+        <property name="text">
+         <string>Дежурный по парку</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="dezh_po_UBM">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>68</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">    QPushButton {
+        background-color: #0171CA;
+        color: rgb(255, 255, 255);
+        border-radius: 10px;
+    }
+    QPushButton:hover {
+        background: rgba(0,0,0,0);
+        color: #3a7999;
+		 border : 2px solid ;
+        border-color: #0171CA;
+    }</string>
+        </property>
+        <property name="text">
+         <string>Дежурный по УБМ</string>
         </property>
        </widget>
       </item>
@@ -1343,11 +1415,11 @@ padding-left:10px</string>
      </layout>
     </widget>
    </widget>
-   <zorder>test_menu</zorder>
+   <zorder>test_box</zorder>
    <zorder>test_result_box</zorder>
    <zorder>test_result_box_menue</zorder>
-   <zorder>test_box</zorder>
    <zorder>main_layout</zorder>
+   <zorder>test_menu</zorder>
   </widget>
  </widget>
  <resources/>

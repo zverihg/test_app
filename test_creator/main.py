@@ -23,11 +23,52 @@ class QuestionPool():
         self.answers = data['answers']
         self.right_answers = data['right_answers']
 
+
+class TypesQuestions():
+
+    instructions_DPCH_PDT:dict[QuestionPool]
+    dezh_po_parku:dict[QuestionPool]
+    dezh_po_UBM:dict[QuestionPool]
+
+    def __init__(self):
+
+        self.instructions_DPCH_PDT = {}
+        self.dezh_po_parku = {}
+        self.dezh_po_UBM = {}
+
+    def _get_json(self):
+        raw = {
+            "instructions_DPCH_PDT": {},
+            "dezh_po_parku": {},
+            "dezh_po_UBM": {},
+        }
+
+        item_list = {
+            "instructions_DPCH_PDT": self.instructions_DPCH_PDT,
+            "dezh_po_parku": self.dezh_po_parku,
+            "dezh_po_UBM": self.dezh_po_UBM,
+        }
+
+        for qustion_type, pool in item_list.items():
+            for idx, question in pool.items():
+                raw[qustion_type][idx] = {
+                    'id_question':question.id_question,
+                    'question':question.question,
+                    'answers':question.answers,
+                    'right_answers':question.right_answers,
+                    'choosen_var':question.choosen_var,
+                    'answer_result':question.answer_result,
+                }
+
+        return raw
+
 class MainWindow(QtWidgets.QMainWindow):
 
     ans_lst:dict = {}
     chooses_lst:dict = {}
-    question_pool:dict = {}
+    question_pool:TypesQuestions = TypesQuestions()
+    
+    active_question_poll:QuestionPool
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -45,6 +86,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.list_questions.clicked.connect(self.clicked_on_row)
         self.ui.add_new_question.clicked.connect(self.add_new_question)
         self.ui.delete_curent_question.clicked.connect(self.del_question)
+
+        self.ui.choose_type_question.addItems(["ДПЧ, ПДПЧ, ПДТ", "Дежурный по парку", "Дежурный по УБМ"])
+        self.ui.choose_type_question.currentTextChanged.connect(self._change_test)
+
+
+    def _change_test(self):
+        print("fuck")
+        test = self.ui.choose_type_question.currentIndex()
+
+        if test == "ДПЧ, ПДПЧ, ПДТ":
+            self.active_question_poll = self.question_pool.instructions_DPCH_PDT
+        elif test == "Дежурный по парку":
+            self.active_question_poll = self.question_pool.dezh_po_parku
+        elif test == "Дежурный по УБМ":
+            self.active_question_poll = self.question_pool.dezh_po_UBM
+        else: print("fuck")
+
+        self.set_question_list_gui()
 
     def _get_json_ready_object(self):
 
@@ -115,7 +174,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for itm in self.ans_lst.values(): itm.setText("")
         idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
 
-        quest = self.question_pool[idx_quest]
+        quest = self.active_question_poll[idx_quest]
         self.ui.test_question.setText(quest.question)
 
         for idx, txt in quest.answers.items():
@@ -126,29 +185,40 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def create_new_json(self):
         self.ui.list_questions.clear()
-        raw_json = {}
+        raw_json = {
+            "instructions_DPCH_PDT": {},
+            "dezh_po_parku": {},
+            "dezh_po_UBM": {},
+        }
 
         with open(f'./config.json', 'w') as fp:
             raw_bin_json = self._onbin(raw_json)
             json.dump(raw_bin_json,fp)
 
-        data = {
+        init_question = {
             'id_question':'1',
             'question': self.ui.test_question.text(),
             'answers':{},
             'right_answers':{},
         }
-
-        self.question_pool['1'] = QuestionPool(data=copy(data))
+        
+        self.question_pool.dezh_po_parku['1'] = QuestionPool(data=copy(init_question))
+        self.question_pool.dezh_po_UBM['1'] = QuestionPool(data=copy(init_question))
+        self.question_pool.instructions_DPCH_PDT['1'] = QuestionPool(data=copy(init_question))
+        self.active_question_poll = self.question_pool.instructions_DPCH_PDT
         self.ui.list_questions.addItem('Вопрос 1')
 
     def save_to_json(self):
 
-        json_question = self._get_json_ready_object()
+        # json_question = self._get_json_ready_object()
+
+        json_question = self.question_pool._get_json()
 
         bin_data = self._onbin(json_question)
         with open('./config.json', 'w') as fil:
             json.dump(bin_data,fil)
+        with open('./raw_config.json', 'w') as fil:
+            json.dump(json_question,fil)
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -163,7 +233,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.test_question.setText('')
         self.ui.list_questions.clear()
 
-        for idx in self.question_pool.keys():
+        for idx in self.active_question_poll.keys():
             self.ui.list_questions.addItem(f"Вопрос {idx}")
 
         item = self.ui.list_questions.item(0)
@@ -242,7 +312,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 'answers':answers,
                 'right_answers':right_answers,
             }
-            self.question_pool[id_question] = QuestionPool(data)
+
+            self.active_question_poll[id_question] = QuestionPool(data)
             self.save_to_json()
         else:
             msg = QMessageBox()

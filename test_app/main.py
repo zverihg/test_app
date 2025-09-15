@@ -36,6 +36,8 @@ class Actual_test(Enum):
     pomdezh_po_chasti = "Помошник дежурного по части"
     dezh_po_chasti = "Дежурный по части"
     instructions_DPCH_PDT = "Инструкции по ДПЧ и ПДТ"
+    dezh_po_parku = "Дежурный по парку"
+    dezh_po_chasti = "Дежурный по УБМ"
 
 class ThereadStatus(Enum):
     run = "run"
@@ -55,6 +57,8 @@ class MainWindow(QtWidgets.QMainWindow):
     time_thread:Thread = None
     question_timeout_thread:Thread = None
     test_status:ThereadStatus = ThereadStatus.run
+    timeout_question:int = 60
+
 
     last_fio:str=''
     last_file:str=''
@@ -67,7 +71,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle('Приложение для администратора')
+        self.setWindowTitle('Приложение для тестов')
         self.setWindowIcon(QIcon(self._resource_path('i.png')))
 
         self.screen_list = [
@@ -96,7 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return os.path.join(base_path, relative_path)
 
     def _onbin(self, a ): return ' '.join( format( ord(x), 'b') for x in ''.join( json.dumps( a ) ) )
-    def _unbin(self, a ):	return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
+    def _unbin(self, a ): return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
 
     def _connect_clicks(self):
 
@@ -259,7 +263,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             sleep(0.1)
             delta = dt.now() - question_start
-            if delta.seconds >= 30:
+            if delta.seconds >= self.timeout_question:
                 if self.test_status == ThereadStatus.stop:
                     return 0
                 else:
@@ -267,7 +271,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self._set_next_question()
                     return 0
 
-            self.ui.time_counter.setText(f'На вопрос осталось {30 - delta.seconds} секунд')
+            self.ui.time_counter.setText(f'На вопрос осталось {self.timeout_question - delta.seconds} секунд')
 
     def _set_next_question(self):
 
