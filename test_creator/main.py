@@ -26,9 +26,9 @@ class QuestionPool():
 
 class TypesQuestions():
 
-    instructions_DPCH_PDT:dict[QuestionPool]
-    dezh_po_parku:dict[QuestionPool]
-    dezh_po_UBM:dict[QuestionPool]
+    instructions_DPCH_PDT:dict = {}
+    dezh_po_parku:dict = {}
+    dezh_po_UBM:dict = {}
 
     def __init__(self):
 
@@ -68,7 +68,7 @@ class MainWindow(QtWidgets.QMainWindow):
     chooses_lst:dict = {}
     question_pool:TypesQuestions = TypesQuestions()
     
-    active_question_poll:QuestionPool
+    active_question_poll:dict = question_pool.instructions_DPCH_PDT
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -92,8 +92,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def _change_test(self):
-        print("fuck")
-        test = self.ui.choose_type_question.currentIndex()
+
+        test = self.ui.choose_type_question.currentText()
 
         if test == "ДПЧ, ПДПЧ, ПДТ":
             self.active_question_poll = self.question_pool.instructions_DPCH_PDT
@@ -105,29 +105,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.set_question_list_gui()
 
-    def _get_json_ready_object(self):
-
-        dict_poll_questions = {}
-
-        for idx, question in self.question_pool.items():
-
-            dict_poll_questions[idx] = {
-                'id_question':question.id_question,
-                'question':question.question,
-                'answers':question.answers,
-                'right_answers':question.right_answers,
-                'choosen_var':question.choosen_var,
-                'answer_result':question.answer_result,
-            }
-
-        return dict_poll_questions
-
     def _resource_path(self, relative_path):
-        try:
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
-
+        base_path = os.path.abspath(".")
         return os.path.join(base_path, relative_path)
 
     def _onbin(self, a ): return ' '.join( format( ord(x), 'b') for x in ''.join( json.dumps( a ) ) )
@@ -137,14 +116,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         idx_question = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
 
-        self.question_pool.pop(idx_question)
+        self.active_question_poll.pop(idx_question)
 
-        tmp = copy(self.question_pool)
-        self.question_pool = {}
+        tmp = copy(self.active_question_poll)
+        self.active_question_poll.clear()
         counter = 1
         for question in tmp.values():
             question.id_question = str(counter)
-            self.question_pool[str(counter)] = question
+            self.active_question_poll[str(counter)] = question
             counter += 1
 
         self.set_question_list_gui()
@@ -165,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
             'answers':{},
             'right_answers':{},
         }
-        self.question_pool[idx] = QuestionPool(data=copy(data))
+        self.active_question_poll[idx] = QuestionPool(data=copy(data))
         self.ui.list_questions.addItem(f"Вопрос {idx}")
 
     def clicked_on_row(self):
@@ -210,8 +189,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_to_json(self):
 
-        # json_question = self._get_json_ready_object()
-
         json_question = self.question_pool._get_json()
 
         bin_data = self._onbin(json_question)
@@ -249,8 +226,15 @@ class MainWindow(QtWidgets.QMainWindow):
             if not data:
                 self.create_new_json()
             else:
-                for idx, question in data.items():
-                    self.question_pool[idx] = QuestionPool(question)
+
+                for idx, question in data["instructions_DPCH_PDT"].items():
+                    self.question_pool.instructions_DPCH_PDT[idx] = QuestionPool(question)
+                
+                for idx, question in data["dezh_po_parku"].items():
+                    self.question_pool.dezh_po_parku[idx] = QuestionPool(question)
+                
+                for idx, question in data["dezh_po_UBM"].items():
+                    self.question_pool.dezh_po_UBM[idx] = QuestionPool(question)
 
         except Exception as e:
             print(e)
