@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from enum import Enum
-import time
+
 class Status(Enum):
     hist = 1
     test = 2
@@ -106,23 +106,25 @@ class Question_gui():
         else:
             self.actual_question -= 1
 
-            now_quest = self.question_pool[str(self.actual_question)]
+            now_quest = self.question_pool[self.actual_question-1]
 
-            self.answer_var_1.setText(now_quest.answers['1'])
-            self.answer_var_2.setText(now_quest.answers['2'])
-            self.answer_var_3.setText(now_quest.answers['3'])
-            self.answer_var_4.setText(now_quest.answers['4'])
-            self.question_text.setText(now_quest.question)
+            self.answer_var_1.setText(now_quest.completedanswers[0].text)
+            self.answer_var_2.setText(now_quest.completedanswers[1].text)
+            self.answer_var_3.setText(now_quest.completedanswers[2].text)
+            self.answer_var_4.setText(now_quest.completedanswers[3].text)
+            self.question_text.setText(now_quest.text)
             self.qty_question_label.setText(f'{self.actual_question}/{self.qty_question}')
 
-            self.choose_answer_1.setCheckState('1' in now_quest.choosen_var and not self.active == Status.test)
-            self.choose_answer_2.setCheckState('2' in now_quest.choosen_var and not self.active == Status.test)
-            self.choose_answer_3.setCheckState('3' in now_quest.choosen_var and not self.active == Status.test)
-            self.choose_answer_4.setCheckState('4' in now_quest.choosen_var and not self.active == Status.test)
+            self.choose_answer_1.setCheckState(now_quest.completedanswers[0].choosen and not self.active == Status.test)
+            self.choose_answer_2.setCheckState(now_quest.completedanswers[1].choosen and not self.active == Status.test)
+            self.choose_answer_3.setCheckState(now_quest.completedanswers[2].choosen and not self.active == Status.test)
+            self.choose_answer_4.setCheckState(now_quest.completedanswers[3].choosen and not self.active == Status.test)
 
             if self.active in [Status.view, Status.hist]:
                 for itm in self.answer_var_list:
-                    if itm[0] in now_quest.choosen_var and itm[0] not in now_quest.right_answers:
+
+                    ans = now_quest.completedanswers[int(itm[0])-1]
+                    if ans.choosen and not ans.is_correct:
                         itm[1].setStyleSheet(self.red_style)
                     else:
                         itm[1].setStyleSheet(self.dafault_style)
@@ -132,24 +134,32 @@ class Question_gui():
 
         for itm in self.answer_var_list: itm[1].setStyleSheet("")
 
-        self.actual_question +=1
-        now_quest = self.question_pool[str(self.actual_question)]
+        self.choose_answer_1.setCheckState(False)
+        self.choose_answer_2.setCheckState(False)
+        self.choose_answer_3.setCheckState(False)
+        self.choose_answer_4.setCheckState(False)
 
-        self.answer_var_1.setText(now_quest.answers['1'])
-        self.answer_var_2.setText(now_quest.answers['2'])
-        self.answer_var_3.setText(now_quest.answers['3'])
-        self.answer_var_4.setText(now_quest.answers['4'])
-        self.question_text.setText(now_quest.question)
+        self.actual_question +=1
+        now_quest = self.question_pool[self.actual_question-1]
+
+        self.answer_var_1.setText(now_quest.completedanswers[0].text)
+        self.answer_var_2.setText(now_quest.completedanswers[1].text)
+        self.answer_var_3.setText(now_quest.completedanswers[2].text)
+        self.answer_var_4.setText(now_quest.completedanswers[3].text)
+        self.question_text.setText(now_quest.text)
         self.qty_question_label.setText(f'{self.actual_question}/{self.qty_question}')
 
-        self.choose_answer_1.setCheckState('1' in now_quest.choosen_var and not self.active == Status.test)
-        self.choose_answer_2.setCheckState('2' in now_quest.choosen_var and not self.active == Status.test)
-        self.choose_answer_3.setCheckState('3' in now_quest.choosen_var and not self.active == Status.test)
-        self.choose_answer_4.setCheckState('4' in now_quest.choosen_var and not self.active == Status.test)
+        if not self.active == Status.test:
+            #TODO set state
+            self.choose_answer_1.setCheckState(now_quest.completedanswers[0].choosen)
+            self.choose_answer_2.setCheckState(now_quest.completedanswers[1].choosen)
+            self.choose_answer_3.setCheckState(now_quest.completedanswers[2].choosen)
+            self.choose_answer_4.setCheckState(now_quest.completedanswers[3].choosen)
 
         if self.active in [Status.view, Status.hist]:
             for itm in self.answer_var_list:
-                if itm[0] in now_quest.choosen_var and itm[0] not in now_quest.right_answers:
+                ans = now_quest.completedanswers[int(itm[0])-1]
+                if ans.choosen and not ans.is_correct:
                     itm[1].setStyleSheet(self.red_style)
                 else:
                     itm[1].setStyleSheet(self.dafault_style)

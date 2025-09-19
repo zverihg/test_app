@@ -4,72 +4,95 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys, os
 from PyQt5 import QtWidgets
-import json
 from Ui_main import Ui_MainWindow
-from copy import copy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import ForeignKey
+from sqlalchemy import String
+from sqlalchemy import Column, Integer, String, Boolean, MetaData, DateTime
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from datetime import datetime as dt
 
-class QuestionPool():
-    id_question:str
-    question:str
-    answers:dict
-    right_answers:list
-    choosen_var:list = []
-    answer_result:bool = False
+from enum import Enum
 
-    def __init__(self, data):
+metadata = MetaData()
+engine = create_engine('sqlite:///dbname.db')
+Base = declarative_base()
 
-        self.id_question = data['id_question']
-        self.question = data['question']
-        self.answers = data['answers']
-        self.right_answers = data['right_answers']
+class TypeTest(Enum):
+
+    instructions_DPCH_PDT = "Инструкции по ДПЧ и ПДТ"
+    dezh_po_parku = "Дежурный по парку"
+    dezh_po_UBM = "Дежурный по УБМ"
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+    completedtests = relationship("CompletedTest", back_populates="users")
+
+class CompletedTest(Base):
+    __tablename__ = 'completedtests'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    test_type = Column(String)
+    test_date = Column(DateTime, default=dt.now)
+    total_time = Column(String)
+    right_ans_qty = Column(Integer)
+    description = Column(String)
+    users = relationship("User", back_populates="completedtests")
+    completedquestions = relationship("CompletedQuestion", back_populates="completedtests")
+    grade = Column(Integer)
+
+class CompletedQuestion(Base):
+    __tablename__ = 'completedquestions'
+    id = Column(Integer, primary_key=True)
+    test_id = Column(Integer, ForeignKey("completedtests.id"))
+    text = Column(String)
+    result = Column(Boolean, default=False)
+    completedanswers = relationship("CompletedAnswer", back_populates="completedquestions")
+    completedtests = relationship("CompletedTest", back_populates="completedquestions")
+
+class CompletedAnswer(Base):
+    __tablename__ = 'completedanswers'
+    id = Column(Integer, primary_key=True)
+    ans_id = Column(Integer)
+    question_id = Column(Integer, ForeignKey("completedquestions.id"))
+    text = Column(String)
+    is_correct = Column(Boolean, default=False)
+    choosen = Column(Boolean, default=False)
+    completedquestions = relationship("CompletedQuestion", back_populates="completedanswers")
+
+class Question(Base):
+
+    __tablename__ = 'questions'
+    id = Column(Integer, primary_key=True)
+    text = Column(String)
+    answers = relationship("Answer", back_populates="question")
+    question_type = Column(String)
+
+class Answer(Base):
+    __tablename__ = 'answers'
+    id = Column(Integer, primary_key=True)
+    ans_id = Column(Integer)
+    question_id = Column(Integer, ForeignKey("questions.id"))
+    text = Column(String)
+    is_correct = Column(Boolean)
+    question = relationship("Question", back_populates="answers")
 
 
-class TypesQuestions():
-
-    instructions_DPCH_PDT:dict = {}
-    dezh_po_parku:dict = {}
-    dezh_po_UBM:dict = {}
-
-    def __init__(self):
-
-        self.instructions_DPCH_PDT = {}
-        self.dezh_po_parku = {}
-        self.dezh_po_UBM = {}
-
-    def _get_json(self):
-        raw = {
-            "instructions_DPCH_PDT": {},
-            "dezh_po_parku": {},
-            "dezh_po_UBM": {},
-        }
-
-        item_list = {
-            "instructions_DPCH_PDT": self.instructions_DPCH_PDT,
-            "dezh_po_parku": self.dezh_po_parku,
-            "dezh_po_UBM": self.dezh_po_UBM,
-        }
-
-        for qustion_type, pool in item_list.items():
-            for idx, question in pool.items():
-                raw[qustion_type][idx] = {
-                    'id_question':question.id_question,
-                    'question':question.question,
-                    'answers':question.answers,
-                    'right_answers':question.right_answers,
-                    'choosen_var':question.choosen_var,
-                    'answer_result':question.answer_result,
-                }
-
-        return raw
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 class MainWindow(QtWidgets.QMainWindow):
 
     ans_lst:dict = {}
     chooses_lst:dict = {}
-    question_pool:TypesQuestions = TypesQuestions()
-    
-    active_question_poll:dict = question_pool.instructions_DPCH_PDT
-
+    active_type:TypeTest = TypeTest.instructions_DPCH_PDT.name
+    ids_question:dict = {}
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -80,8 +103,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ans_lst = { '1':self.ui.answer_1, '2':self.ui.answer_2, '3':self.ui.answer_3, '4':self.ui.answer_4,}
         self.chooses_lst = { '1':self.ui.choose_1, '2':self.ui.choose_2, '3':self.ui.choose_3,'4':self.ui.choose_4,}
-        self.load_json()
 
+        self.set_question_list_gui()
         self.ui.save_curent_question.clicked.connect(self.save_question)
         self.ui.list_questions.clicked.connect(self.clicked_on_row)
         self.ui.add_new_question.clicked.connect(self.add_new_question)
@@ -90,18 +113,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.choose_type_question.addItems(["ДПЧ, ПДПЧ, ПДТ", "Дежурный по парку", "Дежурный по УБМ"])
         self.ui.choose_type_question.currentTextChanged.connect(self._change_test)
 
-
     def _change_test(self):
 
         test = self.ui.choose_type_question.currentText()
 
         if test == "ДПЧ, ПДПЧ, ПДТ":
-            self.active_question_poll = self.question_pool.instructions_DPCH_PDT
+            self.active_type = TypeTest.instructions_DPCH_PDT.name
         elif test == "Дежурный по парку":
-            self.active_question_poll = self.question_pool.dezh_po_parku
+            self.active_type = TypeTest.dezh_po_parku.name
         elif test == "Дежурный по УБМ":
-            self.active_question_poll = self.question_pool.dezh_po_UBM
-        else: print("fuck")
+            self.active_type = TypeTest.dezh_po_UBM.name
+        else: pass
 
         self.set_question_list_gui()
 
@@ -109,99 +131,52 @@ class MainWindow(QtWidgets.QMainWindow):
         base_path = os.path.abspath(".")
         return os.path.join(base_path, relative_path)
 
-    def _onbin(self, a ): return ' '.join( format( ord(x), 'b') for x in ''.join( json.dumps( a ) ) )
-    def _unbin(self, a ): return json.loads( ''.join( chr( int( x, 2 ) ) for x in a.split(' ') ) )
-
     def del_question(self):
 
-        idx_question = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
-
-        self.active_question_poll.pop(idx_question)
-
-        tmp = copy(self.active_question_poll)
-        self.active_question_poll.clear()
-        counter = 1
-        for question in tmp.values():
-            question.id_question = str(counter)
-            self.active_question_poll[str(counter)] = question
-            counter += 1
-
+        idx_gui_quest = int(self.ui.list_questions.currentItem().text().replace("Вопрос ", ""))
+        idx_quest = self.ids_question[idx_gui_quest]
+        question = session.query(Question).filter_by(id=idx_quest).delete()
+        session.commit()
         self.set_question_list_gui()
-        self.clicked_on_row()
-        self.save_to_json()
 
     def add_new_question(self):
 
-        try:
-            idx = self.ui.list_questions.item(len(self.ui.list_questions)-1).text().replace("Вопрос ", "")
-        except:
-            idx = "0"
-
-        idx = str(int(idx)+1)
-        data = {
-            'id_question':idx,
-            'question': '',
-            'answers':{},
-            'right_answers':{},
-        }
-        self.active_question_poll[idx] = QuestionPool(data=copy(data))
+        idx = str(len(self.ids_question)+1)
+ 
         self.ui.list_questions.addItem(f"Вопрос {idx}")
+
+        question = Question(text="введи сюда вопрос", question_type=self.active_type,
+                            answers=[
+                                Answer(text="введи сюда ответ", ans_id = 1, is_correct = False),
+                                Answer(text="введи сюда ответ", ans_id = 2, is_correct = False),
+                                Answer(text="введи сюда ответ", ans_id = 3, is_correct = False),
+                                Answer(text="введи сюда ответ", ans_id = 4, is_correct = False)
+                            ]
+                            )
+        session.add(question)
+        session.commit()
+
+        question = session.query(Question).filter_by(question_type=self.active_type).order_by(Question.id.desc()).first()
+
+        self.ids_question[int(idx)] = question.id
+
+        print(question.id)
 
     def clicked_on_row(self):
 
         for itm in self.chooses_lst.values(): itm.setChecked(False)
         for itm in self.ans_lst.values(): itm.setText("")
-        idx_quest = self.ui.list_questions.currentItem().text().replace("Вопрос ", "")
+        idx_gui_quest = int(self.ui.list_questions.currentItem().text().replace("Вопрос ", ""))
 
-        quest = self.active_question_poll[idx_quest]
-        self.ui.test_question.setText(quest.question)
+        idx_quest = self.ids_question[idx_gui_quest]
 
-        for idx, txt in quest.answers.items():
-            self.ans_lst[idx].setText(txt)
+        question = session.query(Question).filter_by(id = idx_quest).first()
+        self.ui.test_question.setText(question.text)
 
-        for idx in quest.right_answers:
-            self.chooses_lst[idx].setChecked(True)
-
-    def create_new_json(self):
-        self.ui.list_questions.clear()
-        raw_json = {
-            "instructions_DPCH_PDT": {},
-            "dezh_po_parku": {},
-            "dezh_po_UBM": {},
-        }
-
-        with open(f'./config.json', 'w') as fp:
-            raw_bin_json = self._onbin(raw_json)
-            json.dump(raw_bin_json,fp)
-
-        init_question = {
-            'id_question':'1',
-            'question': self.ui.test_question.text(),
-            'answers':{},
-            'right_answers':{},
-        }
-        
-        self.question_pool.dezh_po_parku['1'] = QuestionPool(data=copy(init_question))
-        self.question_pool.dezh_po_UBM['1'] = QuestionPool(data=copy(init_question))
-        self.question_pool.instructions_DPCH_PDT['1'] = QuestionPool(data=copy(init_question))
-        self.active_question_poll = self.question_pool.instructions_DPCH_PDT
-        self.ui.list_questions.addItem('Вопрос 1')
-
-    def save_to_json(self):
-
-        json_question = self.question_pool._get_json()
-
-        bin_data = self._onbin(json_question)
-        with open('./config.json', 'w') as fil:
-            json.dump(bin_data,fil)
-        with open('./raw_config.json', 'w') as fil:
-            json.dump(json_question,fil)
-
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setInformativeText('Вопросы сохранены')
-        msg.StandardButton(QMessageBox.Ok)
-        msg.exec_()
+        for answer in question.answers:
+            self.ans_lst[str(answer.ans_id)].setText(answer.text)
+            if answer.is_correct:
+                self.chooses_lst[str(answer.ans_id)].setChecked(True)
 
     def set_question_list_gui(self):
 
@@ -210,38 +185,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.test_question.setText('')
         self.ui.list_questions.clear()
 
-        for idx in self.active_question_poll.keys():
-            self.ui.list_questions.addItem(f"Вопрос {idx}")
+        questions = session.query(Question).filter_by(question_type=self.active_type).count()
+
+        if not questions:
+            question = Question(text="введи сюда вопрос", question_type=self.active_type,
+                                answers=[
+                                    Answer(text="введи сюда ответ", ans_id = 1, is_correct = False),
+                                    Answer(text="введи сюда ответ", ans_id = 2, is_correct = False),
+                                    Answer(text="введи сюда ответ", ans_id = 3, is_correct = False),
+                                    Answer(text="введи сюда ответ", ans_id = 4, is_correct = False)
+                                ]
+                                )
+            session.add(question)
+            session.commit()
+
+        questions = session.query(Question).filter_by(question_type=self.active_type).all()
+
+        for idx, question in enumerate(questions):
+            self.ui.list_questions.addItem(f"Вопрос {idx+1}")
+            self.ids_question[idx+1] = question.id
 
         item = self.ui.list_questions.item(0)
         self.ui.list_questions.setCurrentItem(item)
-
-    def load_json(self):
-
-        try:
-            with open('./config.json', 'r') as fil:
-                bin_data = json.load(fil)
-                data = self._unbin(bin_data)
-
-            if not data:
-                self.create_new_json()
-            else:
-
-                for idx, question in data["instructions_DPCH_PDT"].items():
-                    self.question_pool.instructions_DPCH_PDT[idx] = QuestionPool(question)
-                
-                for idx, question in data["dezh_po_parku"].items():
-                    self.question_pool.dezh_po_parku[idx] = QuestionPool(question)
-                
-                for idx, question in data["dezh_po_UBM"].items():
-                    self.question_pool.dezh_po_UBM[idx] = QuestionPool(question)
-
-        except Exception as e:
-            print(e)
-            self.create_new_json()
-        finally:
-            self.set_question_list_gui()
-            self.clicked_on_row()
 
     def save_question(self):
 
@@ -288,17 +253,26 @@ class MainWindow(QtWidgets.QMainWindow):
                 msg.exec_()
                 return 0
 
-            id_question = str(self.ui.list_questions.currentItem().text().replace('Вопрос ',''))
+            id_question = int(self.ui.list_questions.currentItem().text().replace('Вопрос ',''))
 
-            data = {
-                'id_question':id_question,
-                'question': self.ui.test_question.text(),
-                'answers':answers,
-                'right_answers':right_answers,
-            }
+            idx = self.ids_question[id_question]
 
-            self.active_question_poll[id_question] = QuestionPool(data)
-            self.save_to_json()
+            question = session.query(Question).filter_by(id = idx).first()
+            question.text = self.ui.test_question.text()
+
+            question.answers[0].text = answers["1"]
+            question.answers[1].text = answers["2"]
+            question.answers[2].text = answers["3"]
+            question.answers[3].text = answers["4"]
+
+            for ans in question.answers:
+                if str(ans.ans_id) in right_answers:
+                    ans.is_correct = True
+                else: 
+                    ans.is_correct = False
+
+            session.commit()
+
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
